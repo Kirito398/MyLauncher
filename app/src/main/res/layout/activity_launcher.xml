@@ -1,18 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.Launcher"
+    android:id="@+id/clLayout">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Activity"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+<!--    <ru.biozzlab.mylauncher.ui.views.DragLayer-->
+<!--        android:id="@+id/dragLayer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:fitsSystemWindows="true"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/hotSeat"-->
+<!--        app:layout_constraintHorizontal_weight="1">-->
+
+<!--        <ru.biozzlab.mylauncher.ui.views.Workspace-->
+<!--            android:id="@+id/workspaceView"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent">-->
+
+<!--            <include-->
+<!--                android:id="@+id/cell1"-->
+<!--                layout="@layout/item_cell" />-->
+
+<!--            <include-->
+<!--                android:id="@+id/cell2"-->
+<!--                layout="@layout/item_cell" />-->
+
+<!--            <include-->
+<!--                android:id="@+id/cell3"-->
+<!--                layout="@layout/item_cell" />-->
+
+<!--            <include-->
+<!--                android:id="@+id/cell4"-->
+<!--                layout="@layout/item_cell" />-->
+
+<!--            <include-->
+<!--                android:id="@+id/cell5"-->
+<!--                layout="@layout/item_cell" />-->
+
+<!--        </ru.biozzlab.mylauncher.ui.views.Workspace>-->
+
+<!--    </ru.biozzlab.mylauncher.ui.views.DragLayer>-->
+
+    <include
+        android:id="@+id/hotSeat"
+        layout="@layout/item_hotseat"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_gravity="end"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CellLayout">
+        <attr name="cellWidth" format="dimension"/>
+        <attr name="cellHeight" format="dimension"/>
+        <attr name="widthGap" format="dimension"/>
+        <attr name="heightGap" format="dimension"/>
+        <attr name="maxGap" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="HotSeat">
+        <attr name="cellCountX"/>
+        <attr name="cellCountY"/>
+    </declare-styleable>
+
+    <declare-styleable name="Workspace">
+        <attr name="cellCountX" format="integer"/>
+        <attr name="cellCountY" format="integer"/>
+    </declare-styleable>
+
+</resources>

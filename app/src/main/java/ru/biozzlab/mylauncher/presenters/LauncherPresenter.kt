@@ -11,6 +11,7 @@ class LauncherPresenter : LauncherViewContract.Presenter {
 
     override fun init() {
         view.checkForLocaleChanged()
+        view.setContentView()
         view.initViews()
     }
 }
