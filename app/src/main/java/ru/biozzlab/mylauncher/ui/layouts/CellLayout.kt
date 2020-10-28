@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.solver.widgets.analyzer.BasicMeasure
 import androidx.core.view.children
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
@@ -67,13 +66,10 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthSpecSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightSpecSize = MeasureSpec.getSize(heightMeasureSpec)
-        val widthSpecMode = MeasureSpec.getMode(widthMeasureSpec)
+        var height = MeasureSpec.getSize(heightMeasureSpec)
+        var width = MeasureSpec.getSize(widthMeasureSpec)
 
-        var height = heightSpecSize
-        var width = widthSpecSize
-        if (widthSpecMode == MeasureSpec.AT_MOST) {
+        if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.AT_MOST) {
             width = paddingLeft + paddingRight + columnCount * cellWidth + (columnCount - 1) * widthGap
             height = paddingTop + paddingBottom + rowCount * cellHeight + (rowCount - 1) * heightGap
         }
