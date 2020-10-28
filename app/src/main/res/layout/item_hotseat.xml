@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.biozzlab.mylauncher.ui.views.HotSeat
+<ru.biozzlab.mylauncher.ui.layouts.HotSeat
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cellCountX="5"
-    app:cellCountY="1">
+    app:cellCountY="1"
+    app:menuButtonPosition="2">
 
-    <ru.biozzlab.mylauncher.ui.views.CellLayout
+    <ru.biozzlab.mylauncher.ui.layouts.CellLayout
         android:id="@+id/hotSeatContent"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:paddingTop="8dp"
+        android:paddingBottom="0dp"
+        android:paddingStart="0dp"
+        android:paddingEnd="0dp"
 
         app:cellWidth="64dp"
         app:cellHeight="64dp"
@@ -20,4 +24,4 @@
         app:heightGap="-1dp"
         app:maxGap="16dp"/>
 
-</ru.biozzlab.mylauncher.ui.views.HotSeat>
+</ru.biozzlab.mylauncher.ui.layouts.HotSeat>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.biozzlab.mylauncher.ui.views.CellLayout
+<ru.biozzlab.mylauncher.ui.layouts.CellLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:hapticFeedbackEnabled="false">
 
-</ru.biozzlab.mylauncher.ui.views.CellLayout>
+</ru.biozzlab.mylauncher.ui.layouts.CellLayout>

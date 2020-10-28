@@ -1,4 +1,4 @@
-package ru.biozzlab.mylauncher.ui.views
+package ru.biozzlab.mylauncher.ui.layouts
 
 import android.app.WallpaperManager
 import android.app.WallpaperManager.COMMAND_DROP
@@ -7,8 +7,9 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
+import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 
-class ShortcutAndWidgetContainer(context: Context, attributeSet: AttributeSet?, defStyle: Int) : ViewGroup(context, attributeSet, defStyle) {
+class CellContainer(context: Context, attributeSet: AttributeSet?, defStyle: Int) : ViewGroup(context, attributeSet, defStyle) {
     constructor(context: Context, attributeSet: AttributeSet) : this(context, attributeSet, 0)
     constructor(context: Context) : this(context, null, 0)
 
@@ -18,11 +19,14 @@ class ShortcutAndWidgetContainer(context: Context, attributeSet: AttributeSet?, 
     private var heightGap: Int = -1
     private var columnCount: Int = -1
 
-    fun setCellDimensions(cellWidth: Int, cellHeight: Int, widthGap: Int, heightGap: Int, columnCount: Int) {
+    fun setCellDimensions(cellWidth: Int, cellHeight: Int, widthGap: Int, heightGap: Int) {
         this.cellWidth = cellWidth
         this.cellHeight = cellHeight
         this.widthGap = widthGap
         this.heightGap = heightGap
+    }
+
+    fun setColumnCount(columnCount: Int) {
         this.columnCount = columnCount
     }
 
@@ -30,7 +34,7 @@ class ShortcutAndWidgetContainer(context: Context, attributeSet: AttributeSet?, 
         for (child in children) {
             if (child.visibility == GONE) continue
 
-            val layoutParams = child.layoutParams as CellLayout.LayoutParams
+            val layoutParams = child.layoutParams as CellLayoutParams
             child.layout(layoutParams.x, layoutParams.y, layoutParams.x + layoutParams.width, layoutParams.y + layoutParams.height)
 
             if (layoutParams.isDropped) {
@@ -60,7 +64,7 @@ class ShortcutAndWidgetContainer(context: Context, attributeSet: AttributeSet?, 
     }
 
     private fun measureChild(child: View) {
-        val layoutParams = child.layoutParams as CellLayout.LayoutParams
+        val layoutParams = child.layoutParams as CellLayoutParams
 
         layoutParams.setup(cellWidth, cellHeight, widthGap, heightGap, invertLayoutHorizontally(), columnCount)
 

@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-<!--    <ru.biozzlab.mylauncher.ui.views.DragLayer-->
+<!--    <ru.biozzlab.mylauncher.ui.layouts.DragLayer-->
 <!--        android:id="@+id/dragLayer"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="match_parent"-->
@@ -55,7 +55,7 @@
 
 <!--        </ru.biozzlab.mylauncher.ui.views.Workspace>-->
 
-<!--    </ru.biozzlab.mylauncher.ui.views.DragLayer>-->
+<!--    </ru.biozzlab.mylauncher.ui.layouts.DragLayer>-->
 
     <include
         android:id="@+id/hotSeat"

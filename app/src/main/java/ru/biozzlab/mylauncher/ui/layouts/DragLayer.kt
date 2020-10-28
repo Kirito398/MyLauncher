@@ -1,4 +1,4 @@
-package ru.biozzlab.mylauncher.ui.views
+package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
 import android.graphics.Canvas

@@ -12,6 +12,7 @@
     <declare-styleable name="HotSeat">
         <attr name="cellCountX"/>
         <attr name="cellCountY"/>
+        <attr name="menuButtonPosition" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="Workspace">

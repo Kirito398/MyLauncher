@@ -1,4 +1,4 @@
-package ru.biozzlab.mylauncher.ui.views
+package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
 import android.util.AttributeSet
@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.item_hotseat.view.*
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.drawable.all_apps_button_icon
 import ru.biozzlab.mylauncher.easyLog
+import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 
 class HotSeat : FrameLayout {
     constructor(context: Context) : this(context, null)
@@ -19,18 +20,16 @@ class HotSeat : FrameLayout {
 
         cellCountX = attrs.getInt(R.styleable.HotSeat_cellCountX, -1)
         cellCountY = attrs.getInt(R.styleable.HotSeat_cellCountY, -1)
+        menuButtonPosition = attrs.getInt(R.styleable.HotSeat_menuButtonPosition, 2)
     }
 
     private val cellCountX: Int
     private val cellCountY: Int
-    //private val allAppsButtonRank: Int
-
+    private val menuButtonPosition: Int
 
     override fun onFinishInflate() {
         super.onFinishInflate()
         hotSeatContent.setGridSize(cellCountX, cellCountY)
-        hotSeatContent.setIsHotSeat(true)
-
         resetLayout()
     }
 
@@ -44,9 +43,7 @@ class HotSeat : FrameLayout {
 
         allAppsButton.setOnClickListener { "OnAllAppsButtonClicked!".easyLog(this::class.java.simpleName) }
 
-        val x = 2
-        val y = 0
-        val params = CellLayout.LayoutParams(x, y, 1, 1)
+        val params = CellLayoutParams(menuButtonPosition, 0, 1, 1)
         hotSeatContent.addViewToCell(allAppsButton, -1, 0, params, true)
     }
 }
