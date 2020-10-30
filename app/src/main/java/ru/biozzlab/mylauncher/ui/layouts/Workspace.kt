@@ -1,8 +1,8 @@
-package ru.biozzlab.mylauncher.ui.views
+package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
 import android.util.AttributeSet
-import ru.biozzlab.mylauncher.ui.views.Workspace as Workspace
+import ru.biozzlab.mylauncher.ui.views.PagedView
 
 class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : PagedView(context, attributeSet, defStyle) {
 

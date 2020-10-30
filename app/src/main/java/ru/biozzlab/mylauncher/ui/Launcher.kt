@@ -8,6 +8,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_launcher.*
+import kotlinx.android.synthetic.main.activity_launcher.view.*
+import kotlinx.android.synthetic.main.item_cell.view.*
 import kotlinx.android.synthetic.main.item_hotseat.view.*
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.cache.CacheImpl
@@ -21,7 +23,7 @@ import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
-import ru.biozzlab.mylauncher.ui.views.Workspace
+import ru.biozzlab.mylauncher.ui.layouts.Workspace
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var presenter: LauncherViewContract.Presenter
@@ -46,6 +48,13 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun initViews() {
         workspace = workspaceView
+
+        workspace.cell1.textCell.text = "Cell 1"
+        workspace.cell2.textCell.text = "Cell 2"
+        workspace.cell3.textCell.text = "Cell 3"
+        workspace.cell4.textCell.text = "Cell 4"
+        workspace.cell5.textCell.text = "Cell 5"
+
         dragController = DragController(this)
 
         dragLayer.setup(this, dragController)

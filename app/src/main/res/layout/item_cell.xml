@@ -5,4 +5,10 @@
     android:layout_height="wrap_content"
     android:hapticFeedbackEnabled="false">
 
+    <TextView
+        android:id="@+id/textCell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cell 1"/>
+
 </ru.biozzlab.mylauncher.ui.layouts.CellLayout>

@@ -28,7 +28,7 @@
         app:layout_constraintBottom_toTopOf="@id/hotSeat"
         app:layout_constraintHorizontal_weight="1">
 
-        <ru.biozzlab.mylauncher.ui.views.Workspace
+        <ru.biozzlab.mylauncher.ui.layouts.Workspace
             android:id="@+id/workspaceView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -53,7 +53,7 @@
                 android:id="@+id/cell5"
                 layout="@layout/item_cell" />
 
-        </ru.biozzlab.mylauncher.ui.views.Workspace>
+        </ru.biozzlab.mylauncher.ui.layouts.Workspace>
 
     </ru.biozzlab.mylauncher.ui.layouts.DragLayer>
 
