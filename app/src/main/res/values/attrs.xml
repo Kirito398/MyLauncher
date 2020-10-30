@@ -20,4 +20,13 @@
         <attr name="cellCountY" format="integer"/>
     </declare-styleable>
 
+    <declare-styleable name="Favorite">
+        <attr name="id" format="integer" />
+        <attr name="className" format="string" />
+        <attr name="packageName" format="string" />
+        <attr name="container" format="integer" />
+        <attr name="x" format="integer" />
+        <attr name="y" format="integer" />
+    </declare-styleable>
+
 </resources>
