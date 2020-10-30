@@ -1,12 +1,6 @@
 package ru.biozzlab.mylauncher.ui
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Rect
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.PaintDrawable
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +19,8 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
+import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
-import ru.biozzlab.mylauncher.ui.views.IconDrawable
 import ru.biozzlab.mylauncher.ui.views.Workspace
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
@@ -51,10 +45,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     override fun initViews() {
-        //workspace = workspaceView
+        workspace = workspaceView
         dragController = DragController(this)
 
-        //dragLayer.setup(this, dragController)
+        dragLayer.setup(this, dragController)
     }
 
     override fun addShortcut(item: ItemShortcut) {
@@ -97,7 +91,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 //        launcherApp.startMainActivity(item.intent.component, item.user, item.intent.sourceBounds, null)
     }
 
-    //fun getDragLayer(): DragLayer = dragLayer
+    fun getDragLayer(): DragLayer = dragLayer
 
     private fun String.showToast() {
         Toast.makeText(this@Launcher, this, Toast.LENGTH_SHORT).show()
