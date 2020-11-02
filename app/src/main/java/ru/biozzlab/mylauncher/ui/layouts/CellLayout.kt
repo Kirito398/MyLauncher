@@ -2,6 +2,7 @@ package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
@@ -87,6 +88,10 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         }
 
         setMeasuredDimension(width, height)
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return false
     }
 
     fun getIsDragOverlapping() = isDragOverlapping
