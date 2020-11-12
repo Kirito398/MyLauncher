@@ -23,6 +23,8 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var heightGap: Int = -1
     private var isDragOverlapping = false
 
+    private var interceptTouchListener: OnTouchListener? = null
+
     private val container: CellContainer = CellContainer(context)
 
     init {
@@ -36,6 +38,10 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         container.setCellDimensions(cellWidth, cellHeight, widthGap, heightGap)
         container.setColumnCount(columnCount)
         addView(container)
+    }
+
+    fun setOnInterceptTouchListener(listener: OnTouchListener) {
+        interceptTouchListener = listener
     }
 
     fun addViewToCell(view: View, index: Int, id: Int, params: CellLayoutParams, markCells: Boolean): Boolean {
@@ -91,7 +97,11 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        return false
+        return interceptTouchListener?.onTouch(this, ev) ?: false
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return true
     }
 
     fun getIsDragOverlapping() = isDragOverlapping

@@ -26,34 +26,34 @@ class DragLayer(context: Context, attrs: AttributeSet) : ConstraintLayout(contex
         this.controller = controller
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event?.run {
-            if (action == MotionEvent.ACTION_DOWN)
-                if (handleTouchDown(this, false))
-                    return true
-            return controller.onTouchEvent(this)
-        } ?: return false
-    }
-
-    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
-        "On intercept touch event".easyLog(this.javaClass.simpleName)
-        ev?.run {
-            if (action == MotionEvent.ACTION_DOWN)
-                if (handleTouchDown(this, true))
-                    return true
-        }
-
-        return super.onInterceptTouchEvent(ev)
-    }
+//    override fun onTouchEvent(event: MotionEvent?): Boolean {
+//        event?.run {
+//            if (action == MotionEvent.ACTION_DOWN)
+//                if (handleTouchDown(this, false))
+//                    return true
+//            return controller.onTouchEvent(this)
+//        } ?: return false
+//    }
+//
+//    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+//        "On intercept touch event".easyLog(this.javaClass.simpleName)
+//        ev?.run {
+//            if (action == MotionEvent.ACTION_DOWN)
+//                if (handleTouchDown(this, true))
+//                    return true
+//        }
+//
+//        return super.onInterceptTouchEvent(ev)
+//    }
 
     private fun handleTouchDown(ev: MotionEvent, intercept: Boolean): Boolean {
         val hitRect = Rect()
         val x = ev.x
         val y = ev.y
 
+        requestDisallowInterceptTouchEvent(true)
 
-
-        return false
+        return true
     }
 
     override fun dispatchDraw(canvas: Canvas?) {

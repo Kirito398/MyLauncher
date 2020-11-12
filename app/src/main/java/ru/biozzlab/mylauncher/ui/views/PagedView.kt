@@ -9,7 +9,7 @@ import ru.biozzlab.mylauncher.ui.layouts.interfaces.Page
 import kotlin.math.*
 
 abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
-    : ViewGroup(context, attrs, defStyle) {
+    : ViewGroup(context, attrs, defStyle), ViewGroup.OnHierarchyChangeListener {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
 
@@ -65,12 +65,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     init {
         isHapticFeedbackEnabled = false
 
-        val count = childCount
-        for (i in 0 .. count) {
-            childOffset.add(i, -1)
-            childRelativeOffset.add(i, -1)
-            childOffsetWithLayoutScale.add(i, -1)
-        }
+        invalidateCachedOffsets()
 
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledTouchSlop
@@ -80,6 +75,24 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         flingThresholdVelocity = FLING_THRESHOLD_VELOCITY * density
         minFlingVelocity = MIN_FLING_VELOCITY * density
         minSnapVelocity = MIN_SNAP_VELOCITY * density
+    }
+
+    private fun invalidateCachedOffsets() {
+        childOffset.clear()
+        childRelativeOffset.clear()
+        childOffsetWithLayoutScale.clear()
+
+        val count = childCount
+        for (i in 0 .. count) {
+            childOffset.add(i, -1)
+            childRelativeOffset.add(i, -1)
+            childOffsetWithLayoutScale.add(i, -1)
+        }
+    }
+
+    override fun onChildViewAdded(parent: View?, child: View?) {
+        invalidate()
+        invalidateCachedOffsets()
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
@@ -141,11 +154,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
             }
         }
 
-        return false
-    }
-
-    override fun onHoverEvent(event: MotionEvent?): Boolean {
-        return true
+        return touchState != TouchStates.REST
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -426,7 +435,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         val screenCenter = scrollX + measuredWidth / 2
 
         val count = childCount
-        for (i in 1 .. childCount) {
+        for (i in 1 until childCount) {
             val layout = getChildAt(i)
             val childWidth = getScaledMeasuredWidth(layout)
             val halfChildWidth = childWidth / 2
@@ -517,6 +526,8 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
             isHorizontalScrollBarEnabled = true
             isFirstLayout = false
         }
+
+        invalidateCachedOffsets()
     }
 
     override fun scrollTo(x: Int, y: Int) {
@@ -554,7 +565,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     }
 
     private fun overScroll(i: Int) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
     private fun getScaledMeasuredWidth(child: View): Int {
