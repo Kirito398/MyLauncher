@@ -11,10 +11,6 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
     constructor(context: Context, attributeSet: AttributeSet) : this(context, attributeSet, 0)
 
-    override fun syncPageItems(i: Int, b: Boolean) {
-        //TODO("Not yet implemented")
-    }
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         computeScroll()
