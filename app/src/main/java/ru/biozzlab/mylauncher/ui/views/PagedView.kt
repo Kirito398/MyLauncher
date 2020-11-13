@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.*
 import android.widget.Scroller
+import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.domain.types.TouchStates
-import ru.biozzlab.mylauncher.ui.layouts.interfaces.Page
 import kotlin.math.*
 
 abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
@@ -35,6 +35,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     private var unboundedScrollX = 0
 
     private val scroller = Scroller(context)
+    private var scrollIndicator: View? = null
     private var touchSlop: Int
 
 
@@ -47,6 +48,13 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledTouchSlop
+    }
+
+    private fun initScrollIndicator() {
+        if (scrollIndicator == null) {
+            scrollIndicator = (parent as ViewGroup?)?.run { findViewById(R.id.ivPageIndicator) }
+            scrollIndicator?.visibility = View.VISIBLE
+        }
     }
 
     private fun invalidateCachedOffsets() {
@@ -117,6 +125,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
             touchState = TouchStates.SCROLLING
             totalMotionX += abs(lastMotionX - x)
             lastMotionX = x
+            onScrollingStart()
         }
     }
 
@@ -126,6 +135,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         return when (action) {
             MotionEvent.ACTION_DOWN -> {
                 downMotionX = lastMotionX
+                if (touchState == TouchStates.SCROLLING) onScrollingStart()
                 return true
             }
             MotionEvent.ACTION_MOVE -> scrolling(event)
@@ -186,6 +196,8 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     private fun computeScrollHelper(): Boolean {
         if (scroller.computeScrollOffset()) {
             if (scrollX != scroller.currX || scrollY != scroller.currY) scrollTo(scroller.currX, scroller.currY)
+            //if (touchState == TouchStates.REST)
+                onScrollingEnd()
             invalidate()
             return true
         }
@@ -245,9 +257,9 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         if (widthMode != MeasureSpec.EXACTLY)
             throw IllegalStateException("Workspace can only be used in EXACTLY mode")
 
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        if (heightMode != MeasureSpec.EXACTLY)
-            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
+//        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+//        if (heightMode != MeasureSpec.EXACTLY)
+//            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
 
         for (i in 0 until childCount)
             getChildAt(i).measure(widthMeasureSpec, heightMeasureSpec)
@@ -304,4 +316,35 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     }
 
     private fun isLayoutRtl(): Boolean  = layoutDirection == LAYOUT_DIRECTION_RTL
+
+    private fun onScrollingStart() {
+        updateScrollIndicatorPosition()
+    }
+
+    private fun onScrollingEnd() {
+        updateScrollIndicatorPosition()
+    }
+
+    private fun updateScrollIndicatorPosition() {
+        initScrollIndicator()
+        scrollIndicator?.let {
+            val isRtl = isLayoutRtl()
+            val pageCount = childCount
+            val pageWidth = measuredWidth
+
+            val maxScrollX = getChildOffset(childCount - 1) - getRelativeChildOffset(childCount - 1)
+            val scrollPos = if (isRtl) maxScrollX - scrollX else scrollX
+            var offset = max(0F, min(1F, scrollPos.toFloat() / maxScrollX))
+            if (isRtl) offset = 1.0F - offset
+            val indicatorSpace = pageWidth / pageCount
+            val indicatorPos = (offset * (pageWidth - indicatorSpace))
+
+            if (it.measuredWidth != indicatorSpace) {
+                it.layoutParams.width = indicatorSpace
+                it.requestLayout()
+            }
+
+            it.translationX = indicatorPos
+        }
+    }
 }
