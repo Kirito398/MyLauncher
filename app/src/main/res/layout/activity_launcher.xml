@@ -25,13 +25,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/hotSeat"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_weight="1">
 
-        <ru.biozzlab.mylauncher.ui.views.Workspace
+        <ru.biozzlab.mylauncher.ui.layouts.Workspace
             android:id="@+id/workspaceView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ivPageIndicator">
 
             <include
                 android:id="@+id/cell1"
@@ -53,18 +57,27 @@
                 android:id="@+id/cell5"
                 layout="@layout/item_cell" />
 
-        </ru.biozzlab.mylauncher.ui.views.Workspace>
+        </ru.biozzlab.mylauncher.ui.layouts.Workspace>
+
+        <ImageView
+            android:id="@+id/ivPageIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/hotSeat"
+            app:layout_constraintStart_toStartOf="parent"
+            android:src="@drawable/scroll_indicator"
+            android:scaleType="fitXY"/>
+
+        <include
+            android:id="@+id/hotSeat"
+            layout="@layout/item_hotseat"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_gravity="end"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </ru.biozzlab.mylauncher.ui.layouts.DragLayer>
-
-    <include
-        android:id="@+id/hotSeat"
-        layout="@layout/item_hotseat"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_gravity="end"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
