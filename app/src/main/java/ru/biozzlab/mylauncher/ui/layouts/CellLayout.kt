@@ -15,6 +15,11 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
     constructor(context: Context, attributeSet: AttributeSet) : this(context, attributeSet, 0)
 
+    companion object {
+        const val DEFAULT_COLUMN_COUNT = 4
+        const val DEFAULT_ROW_COUNT = 4
+    }
+
     private var columnCount: Int = -1
     private var rowCount: Int = -1
     private var cellWidth: Int = -1
@@ -34,6 +39,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         widthGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_widthGap, 0)
         heightGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_heightGap, 0)
         attrs.recycle()
+
+        columnCount = DEFAULT_COLUMN_COUNT
+        rowCount = DEFAULT_ROW_COUNT
 
         container.setCellDimensions(cellWidth, cellHeight, widthGap, heightGap)
         container.setColumnCount(columnCount)

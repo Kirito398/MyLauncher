@@ -7,6 +7,7 @@
         launcher:container="0"
         launcher:x="0"
         launcher:y="0" />
+
     <favorite
         launcher:id="1"
         launcher:packageName="com.android.contacts"
@@ -14,6 +15,7 @@
         launcher:container="0"
         launcher:x="1"
         launcher:y="0" />
+
     <favorite
         launcher:id="2"
         launcher:packageName="com.android.mms"
@@ -21,6 +23,7 @@
         launcher:container="0"
         launcher:x="3"
         launcher:y="0" />
+
     <favorite
         launcher:id="3"
         launcher:packageName="com.android.browser"
@@ -28,4 +31,70 @@
         launcher:container="0"
         launcher:x="4"
         launcher:y="0" />
+
+    <favorite
+        launcher:id="4"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="3"
+        launcher:y="0" />
+
+
+    <favorite
+        launcher:id="5"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="2"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="6"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="1"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="7"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="8"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="3"
+        launcher:y="1" />
+
+
+    <favorite
+        launcher:id="9"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="2"
+        launcher:y="1" />
+
+    <favorite
+        launcher:id="10"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="1"
+        launcher:y="1" />
+
+    <favorite
+        launcher:id="11"
+        launcher:packageName="com.android.mms"
+        launcher:className="com.android.mms.ui.ConversationList"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="1" />
 </favorites>

@@ -21,6 +21,7 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
+import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
@@ -49,11 +50,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun initViews() {
         workspace = workspaceView
 
-        workspace.cell1.textCell.text = "Cell 1"
-        workspace.cell2.textCell.text = "Cell 2"
-        workspace.cell3.textCell.text = "Cell 3"
-        workspace.cell4.textCell.text = "Cell 4"
-        workspace.cell5.textCell.text = "Cell 5"
+        workspace.cell1.setBackgroundColor(resources.getColor(R.color.colorAccent))
 
         dragController = DragController(this)
 
@@ -63,8 +60,22 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun addShortcut(item: ItemShortcut) {
         when (item.container) {
             ContainerType.HOT_SEAT -> addShortcutIntoHotSeat(item)
-            ContainerType.DESKTOP -> TODO()
+            ContainerType.DESKTOP -> addShortcutIntoDesktop(item)
         }
+    }
+
+    private fun addShortcutIntoDesktop(item: ItemShortcut) {
+        val cell = workspace.getChildAt(0) as CellLayout
+        val shortcut = createShortcut(cell, item) ?: return
+        val params = shortcut.layoutParams as CellLayoutParams
+
+        params.cellX = item.cellX
+        params.cellY = item.cellY
+        params.cellHSpan = item.cellHSpan
+        params.cellVSpan = item.cellVSpan
+
+        cell.addViewToCell(shortcut, -1, 0, params, false)
+        workspace.requestLayout()
     }
 
     private fun addShortcutIntoHotSeat(itemCell: ItemShortcut) {
