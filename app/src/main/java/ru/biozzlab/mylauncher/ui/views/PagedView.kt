@@ -14,6 +14,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
 
     companion object {
+        const val SIGNIFICANT_MOVE_THRESHOLD = 0.4F
         const val PAGE_SNAP_ANIMATION_DURATION = 550
     }
 
@@ -96,6 +97,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
         lastMotionX = x
         totalMotionX = 0.0F
+        downMotionX = lastMotionX
         activePointerId = ev.getPointerId(0)
 
         val xDist = abs(scroller.finalX - scroller.currX)
@@ -139,9 +141,40 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
                 return true
             }
             MotionEvent.ACTION_MOVE -> scrolling(event)
-            MotionEvent.ACTION_UP -> snapToDestination()
+            MotionEvent.ACTION_UP -> snapToDestination(event)
             else -> true
         }
+    }
+
+    private fun snapToDestination(event: MotionEvent): Boolean {
+        when (touchState) {
+            TouchStates.REST -> TODO()
+            TouchStates.SCROLLING -> {
+                val pointerIndex = event.findPointerIndex(activePointerId)
+                val x = event.getX(pointerIndex)
+                val deltaX = x - downMotionX
+
+                val pageWidth = getScaledMeasuredWidth(getChildAt(currentPage))
+                val isSignificantMove = abs(deltaX) > pageWidth * SIGNIFICANT_MOVE_THRESHOLD
+
+                totalMotionX += abs(lastMotionX - x)
+
+                val isRtl = isLayoutRtl()
+                val isDeltaXLeft = if (isRtl) deltaX > 0 else deltaX < 0
+
+                val finalPage = when {
+                    (isSignificantMove && !isDeltaXLeft && currentPage > 0) -> currentPage - 1
+                    (isSignificantMove && isDeltaXLeft && currentPage < childCount - 1) -> currentPage + 1
+                    else -> currentPage
+                }
+
+                snapToPage(finalPage)
+            }
+            TouchStates.PREV_PAGE -> TODO()
+            TouchStates.NEXT_PAGE -> TODO()
+        }
+
+        return true
     }
 
     private fun snapToDestination(): Boolean {
@@ -181,6 +214,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     private fun snapToPage(page: Int, delta: Int, duration: Int = PAGE_SNAP_ANIMATION_DURATION) {
         if (!scroller.isFinished) scroller.abortAnimation()
         scroller.startScroll(unboundedScrollX, 0, delta, 0, duration)
+        currentPage = page
         invalidate()
     }
 
