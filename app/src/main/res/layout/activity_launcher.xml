@@ -8,15 +8,6 @@
     tools:context=".ui.Launcher"
     android:id="@+id/clLayout">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Activity"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
     <ru.biozzlab.mylauncher.ui.layouts.DragLayer
         android:id="@+id/dragLayer"
         android:layout_width="match_parent"
