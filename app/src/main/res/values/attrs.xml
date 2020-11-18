@@ -27,6 +27,7 @@
         <attr name="container" format="integer" />
         <attr name="x" format="integer" />
         <attr name="y" format="integer" />
+        <attr name="desktopNumber" format="integer" />
     </declare-styleable>
 
 </resources>

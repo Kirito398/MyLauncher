@@ -2,18 +2,14 @@ package ru.biozzlab.mylauncher.ui
 
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.ComponentInfo
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_launcher.*
-import kotlinx.android.synthetic.main.activity_launcher.view.*
-import kotlinx.android.synthetic.main.item_cell.view.*
 import kotlinx.android.synthetic.main.item_hotseat.view.*
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.cache.CacheImpl
@@ -54,8 +50,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun initViews() {
         workspace = workspaceView
 
-        //workspace.cell1.setBackgroundColor(resources.getColor(R.color.colorAccent))
-
         dragController = DragController(this)
 
         dragLayer.setup(this, dragController)
@@ -69,7 +63,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     private fun addShortcutIntoDesktop(item: ItemShortcut) {
-        val cell = workspace.getChildAt(0) as CellLayout
+        val cell = workspace.getChildAt(item.desktopNumber) as CellLayout
         val shortcut = createShortcut(cell, item) ?: return
         val params = shortcut.layoutParams as CellLayoutParams
 
@@ -78,7 +72,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         params.cellHSpan = item.cellHSpan
         params.cellVSpan = item.cellVSpan
 
-        cell.addViewToCell(shortcut, -1, 0, params, false)
+        cell.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
         workspace.requestLayout()
     }
 
@@ -94,7 +88,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
 
-        hotSeat.hotSeatContent.addViewToCell(shortcut, -1, 0, params, false)
+        hotSeat.hotSeatContent.addViewToCell(shortcut, -1, itemCell.id.toInt(), params, false)
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {

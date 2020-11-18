@@ -10,7 +10,8 @@ data class CellEntity(
     val className: String,
     val container: Int,
     val cellX: Int,
-    val cellY: Int
+    val cellY: Int,
+    val desktopNumber: Int
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
