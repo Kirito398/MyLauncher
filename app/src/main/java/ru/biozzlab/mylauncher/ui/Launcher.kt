@@ -56,15 +56,12 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     override fun addShortcut(item: ItemShortcut) {
-        when (item.container) {
-            ContainerType.HOT_SEAT -> addShortcutIntoHotSeat(item)
-            ContainerType.DESKTOP -> addShortcutIntoDesktop(item)
+        val layout = when (item.container) {
+            ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
+            ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
         }
-    }
 
-    private fun addShortcutIntoDesktop(item: ItemShortcut) {
-        val cell = workspace.getChildAt(item.desktopNumber) as CellLayout
-        val shortcut = createShortcut(cell, item) ?: return
+        val shortcut = createShortcut(layout, item) ?: return
         val params = shortcut.layoutParams as CellLayoutParams
 
         params.cellX = item.cellX
@@ -72,23 +69,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         params.cellHSpan = item.cellHSpan
         params.cellVSpan = item.cellVSpan
 
-        cell.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
-        workspace.requestLayout()
-    }
+        if (item.container == ContainerType.HOT_SEAT)
+            (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
 
-    private fun addShortcutIntoHotSeat(itemCell: ItemShortcut) {
-        val layout = hotSeat.hotSeatContent
-        val shortcut = createShortcut(layout, itemCell) ?: return
-        val params = shortcut.layoutParams as CellLayoutParams
-
-        params.cellX = itemCell.cellX
-        params.cellY = itemCell.cellY
-        params.cellHSpan = itemCell.cellHSpan
-        params.cellVSpan = itemCell.cellVSpan
-
-        (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
-
-        hotSeat.hotSeatContent.addViewToCell(shortcut, -1, itemCell.id.toInt(), params, false)
+        layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
