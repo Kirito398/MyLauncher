@@ -1,15 +1,15 @@
 package ru.biozzlab.mylauncher.ui
 
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_launcher.*
-import kotlinx.android.synthetic.main.activity_launcher.view.*
-import kotlinx.android.synthetic.main.item_cell.view.*
 import kotlinx.android.synthetic.main.item_hotseat.view.*
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.cache.CacheImpl
@@ -21,6 +21,7 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
+import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
@@ -49,41 +50,39 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun initViews() {
         workspace = workspaceView
 
-        workspace.cell1.textCell.text = "Cell 1"
-        workspace.cell2.textCell.text = "Cell 2"
-        workspace.cell3.textCell.text = "Cell 3"
-        workspace.cell4.textCell.text = "Cell 4"
-        workspace.cell5.textCell.text = "Cell 5"
-
         dragController = DragController(this)
 
         dragLayer.setup(this, dragController)
     }
 
     override fun addShortcut(item: ItemShortcut) {
-        when (item.container) {
-            ContainerType.HOT_SEAT -> addShortcutIntoHotSeat(item)
-            ContainerType.DESKTOP -> TODO()
+        val layout = when (item.container) {
+            ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
+            ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
         }
-    }
 
-    private fun addShortcutIntoHotSeat(itemCell: ItemShortcut) {
-        val layout = hotSeat.hotSeatContent
-        val shortcut = createShortcut(layout, itemCell) ?: return
+        val shortcut = createShortcut(layout, item) ?: return
         val params = shortcut.layoutParams as CellLayoutParams
 
-        params.cellX = itemCell.cellX
-        params.cellY = itemCell.cellY
-        params.cellHSpan = itemCell.cellHSpan
-        params.cellVSpan = itemCell.cellVSpan
+        params.cellX = item.cellX
+        params.cellY = item.cellY
+        params.cellHSpan = item.cellHSpan
+        params.cellVSpan = item.cellVSpan
 
-        hotSeat.hotSeatContent.addViewToCell(shortcut, -1, 0, params, false)
+        if (item.container == ContainerType.HOT_SEAT)
+            (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
+
+        layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
-        val view = layoutInflater.inflate(R.layout.item_application, parent, false) as TextView
+        val view = layoutInflater.inflate(R.layout.item_application, parent, false) as AppCompatTextView
         view.setOnClickListener { openApp(item.intent) }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
+
+        val name = packageManager.getActivityInfo(ComponentName(item.packageName, item.className), 0).loadLabel(packageManager).toString()
+        item.title = name
+
         view.text = item.title
         return view
     }

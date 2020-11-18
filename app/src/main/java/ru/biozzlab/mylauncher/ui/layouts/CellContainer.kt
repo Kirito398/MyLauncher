@@ -45,8 +45,8 @@ class CellContainer(context: Context, attributeSet: AttributeSet?, defStyle: Int
                 WallpaperManager.getInstance(context).sendWallpaperCommand(
                     windowToken,
                     COMMAND_DROP,
-                    cellPosition[0] + layoutParams.x / 2,
-                    cellPosition[1] + layoutParams.y / 2,
+                    cellPosition[0] + layoutParams.x + layoutParams.width / 2,
+                    cellPosition[1] + layoutParams.y + layoutParams.height / 2,
                     0,
                     null)
             }
@@ -68,8 +68,8 @@ class CellContainer(context: Context, attributeSet: AttributeSet?, defStyle: Int
 
         layoutParams.setup(cellWidth, cellHeight, widthGap, heightGap, invertLayoutHorizontally(), columnCount)
 
-        val heightMeasureSpec = MeasureSpec.makeMeasureSpec(layoutParams.width, MeasureSpec.EXACTLY)
-        val widthMeasureSpec = MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.EXACTLY)
+        val heightMeasureSpec = MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.EXACTLY)
+        val widthMeasureSpec = MeasureSpec.makeMeasureSpec(layoutParams.width, MeasureSpec.EXACTLY)
         child.measure(widthMeasureSpec, heightMeasureSpec)
     }
 

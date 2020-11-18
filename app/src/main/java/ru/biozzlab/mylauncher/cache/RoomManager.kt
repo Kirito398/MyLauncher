@@ -56,10 +56,11 @@ abstract class RoomManager : RoomDatabase() {
                                 val id = attrs.getInt(R.styleable.Favorite_id, -1)
                                 val cellX = attrs.getInt(R.styleable.Favorite_x, -1)
                                 val cellY = attrs.getInt(R.styleable.Favorite_y, -1)
+                                val desktopNumber = attrs.getInt(R.styleable.Favorite_desktopNumber, 0)
 
                                 if (id == -1 || cellX == -1 || cellY == -1) continue
 
-                                addCell(db, id, packageName, className, container, cellX, cellY)
+                                addCell(db, id, packageName, className, container, cellX, cellY, desktopNumber)
                             }
                         }
                     }).build()
@@ -74,7 +75,8 @@ abstract class RoomManager : RoomDatabase() {
             className: String,
             container: Int,
             cellX: Int,
-            cellY: Int
+            cellY: Int,
+            desktopNumber: Int = 0
         ) {
             val sqlRequest = "INSERT INTO ${RoomConstants.TABLE_CELLS} VALUES(" +
                     "${id}, " +
@@ -82,7 +84,8 @@ abstract class RoomManager : RoomDatabase() {
                     "'$className', " +
                     "$container, " +
                     "$cellX, " +
-                    "$cellY);"
+                    "$cellY, " +
+                    "$desktopNumber);"
 
             db.execSQL(sqlRequest)
         }

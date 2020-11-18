@@ -16,11 +16,13 @@ class CacheImpl(private val roomManager: RoomManager) : Cache {
         for (entity in entities)
             list.add(
                 ItemCell(
+                    entity.id,
                 ContainerType.fromID(entity.container) ?: ContainerType.DESKTOP,
                     entity.packageName,
                     entity.className,
                     entity.cellX,
-                    entity.cellY
+                    entity.cellY,
+                    entity.desktopNumber
                 )
             )
         return Either.Right(list)

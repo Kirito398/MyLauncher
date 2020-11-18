@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.biozzlab.mylauncher.ui.layouts.CellLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ru.biozzlab.mylauncher.ui.layouts.CellLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:hapticFeedbackEnabled="false"
-    android:padding="10dp">
-
-    <TextView
-        android:id="@+id/textCell"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cell 1"
-        android:background="@color/colorPrimaryDark"/>
+    android:paddingTop="15dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    app:cellWidth="80dp"
+    app:cellHeight="100dp"
+    app:widthGap="0dp"
+    app:heightGap="0dp"
+    app:maxGap="16dp">
 
 </ru.biozzlab.mylauncher.ui.layouts.CellLayout>

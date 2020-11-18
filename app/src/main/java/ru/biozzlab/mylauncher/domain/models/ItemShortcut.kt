@@ -18,16 +18,19 @@ import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.ui.views.IconDrawable
 
 class ItemShortcut(cell: ItemCell) : ItemCell(
+    cell.id,
     cell.container,
     cell.packageName,
     cell.className,
     cell.cellX,
     cell.cellY,
+    cell.desktopNumber,
     cell.cellHSpan,
     cell.cellVSpan
 ) {
     lateinit var intent: Intent
     var icon: IconDrawable? = null
+    var title: String = ""
 
     init {
         createIntent(cell.packageName, cell.className)
