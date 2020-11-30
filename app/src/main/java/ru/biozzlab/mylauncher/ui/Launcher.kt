@@ -79,7 +79,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
         val view = layoutInflater.inflate(R.layout.item_application, parent, false) as AppCompatTextView
         view.setOnClickListener { openApp(item.intent) }
-        view.setOnLongClickListener { workspace.startDrag(it, item); return@setOnLongClickListener false }
+        view.setOnLongClickListener { workspace.startDrag(it); return@setOnLongClickListener false }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
 
         val name = packageManager.getActivityInfo(ComponentName(item.packageName, item.className), 0).loadLabel(packageManager).toString()

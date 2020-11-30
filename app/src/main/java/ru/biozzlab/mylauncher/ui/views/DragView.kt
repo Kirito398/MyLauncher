@@ -2,7 +2,8 @@ package ru.biozzlab.mylauncher.ui.views
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Point
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
@@ -11,6 +12,7 @@ import ru.biozzlab.mylauncher.ui.layouts.params.DragLayerParams
 class DragView(context: Context) : View(context) {
 
     private lateinit var bitmap: Bitmap
+    private lateinit var paint: Paint
     private lateinit var dragLayer: DragLayer
     private var registrationX = -1
     private var registrationY = -1
@@ -27,6 +29,16 @@ class DragView(context: Context) : View(context) {
         this.dragLayer = dragLayer
         this.registrationX = registrationX
         this.registrationY = registrationY
+
+        paint = Paint(Paint.FILTER_BITMAP_FLAG)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        setMeasuredDimension(bitmap.width, bitmap.height)
+    }
+
+    override fun onDraw(canvas: Canvas?) {
+        canvas?.drawBitmap(bitmap, 0.0F, 0.0F, paint)
     }
 
     fun show(motionDownX: Int, motionDownY: Int) {

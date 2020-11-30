@@ -113,7 +113,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         position[1] = paddingTop + cellY * (cellHeight + heightGap)
     }
 
-    fun findNearestArea(x: Float, y: Float): MutableList<Int> {
+    fun findNearestArea(x: Int, y: Int): MutableList<Int> {
         var minDistance = Double.MAX_VALUE
         val point = mutableListOf(-1, -1)
 
@@ -122,7 +122,10 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
                 val cellPosition = mutableListOf(-1, -1)
                 cellToPoint(column, row, cellPosition)
 
-                val distance = sqrt((cellPosition[0] - x).toDouble().pow(2.0) + (cellPosition[1] - y).toDouble().pow(2.0))
+                val centerX = x - cellWidth / 2
+                val centerY = y - cellHeight / 2
+
+                val distance = sqrt((cellPosition[0] - centerX).toDouble().pow(2.0) + (cellPosition[1] - centerY).toDouble().pow(2.0))
 
                 if (distance >= minDistance) continue
 

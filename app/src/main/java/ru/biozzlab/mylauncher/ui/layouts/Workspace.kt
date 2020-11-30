@@ -29,7 +29,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         const val DRAG_BITMAP_PADDING = 2
     }
 
-    private lateinit var item: ItemShortcut
+    private lateinit var dragView: View
     private lateinit var dragOutline: Bitmap
     private lateinit var dragController: DragController
     private lateinit var dragTargetLayout: CellLayout
@@ -38,7 +38,6 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
     init {
         (context as Launcher).windowManager.defaultDisplay.getSize(displaySize)
-        //dragTargetLayout = getCurrentDragTargetLayout()
     }
 
     fun setup(dragController: DragController) {
@@ -46,13 +45,13 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragController.setDropTarget(this)
     }
 
-    fun startDrag(view: View, item: ItemShortcut) {
+    fun startDrag(view: View) {
         if (!view.isInTouchMode) return
         view.visibility = View.INVISIBLE
-        this.item = item
+        this.dragView = view
 
         //dragOutline = createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
-        dragOutline = item.iconBitmap!!
+        dragOutline = (dragView.tag as ItemShortcut).iconBitmap!!
 
         beginDragShared(view)
     }
@@ -177,17 +176,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragTargetLayout = getCurrentDragTargetLayout()
 
         dragObject.dragView?.let {
-            val dragViewVisualCenter = getDragViewVisualCenter(dragObject.x, dragObject.y, it)
-            val targetPosition = dragTargetLayout.findNearestArea(dragViewVisualCenter[0], dragViewVisualCenter[1])
+            val targetPosition = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y)
             dragTargetLayout.setDragOutlineBitmap(dragOutline, targetPosition, it.dragRegion)
         }
     }
-
-    private fun getDragViewVisualCenter(x: Int, y: Int, dragView: DragView): MutableList<Float> =
-        mutableListOf(
-            x + dragView.dragRegion.width() / 2.0F,
-            y + dragView.dragRegion.height() / 2.0F
-        )
 
     override fun acceptDrop(dragObject: DragObject): Boolean {
         //TODO("Not yet implemented")
@@ -195,7 +187,8 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     }
 
     override fun onDrop(dragObject: DragObject) {
-
+        dragObject.deferDragViewCleanupPostAnimation = false
+        dragView.visibility = View.VISIBLE
     }
 
     override fun getHitRect(rect: Rect) {
