@@ -23,7 +23,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
     companion object {
         const val DEFAULT_COLUMN_COUNT = 4
-        const val DEFAULT_ROW_COUNT = 4
+        const val DEFAULT_ROW_COUNT = 5
         const val DRAG_OUTLINE_PAINT_ALPHA = 125
     }
 
@@ -33,7 +33,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var cellHeight: Int = -1
     private var widthGap: Int = -1
     private var heightGap: Int = -1
-    private var isDragOverlapping = false
+
 
     private var interceptTouchListener: OnTouchListener? = null
     private var dragOutlineBitmap: Bitmap? = null
@@ -139,22 +139,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     }
 
     override fun onDraw(canvas: Canvas?) {
-        //val rect = Rect()
-
-        //scaleRectAboutCenter(dragOutlineRect, rect, 1.0F)
-
         dragOutlineBitmap?.let {
             canvas?.drawBitmap(it, null, dragOutlineRect, dragOutlinePaint)
         }
-    }
-
-    private fun scaleRectAboutCenter(dragOutlineRect: Rect, rect: Rect, scale: Float) {
-        val centerX = dragOutlineRect.centerX()
-        val centerY = dragOutlineRect.centerY()
-
-        rect.set(dragOutlineRect)
-        rect.offset(-centerX, -centerY)
-        rect.offset(centerX, centerY)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -193,8 +180,6 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         return true
     }
-
-    fun getIsDragOverlapping() = isDragOverlapping
 
     override fun removeAllViewsInLayout() {
         if (container.childCount <= 0) return

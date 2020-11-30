@@ -8,7 +8,6 @@ data class DragObject(
     var y: Int = -1
 ) {
     lateinit var dragSource: DragSource
-    lateinit var dragInfo: Any
     var dragView: DragView? = null
     var deferDragViewCleanupPostAnimation = true
 }

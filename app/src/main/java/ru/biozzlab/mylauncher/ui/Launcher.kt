@@ -28,8 +28,8 @@ import ru.biozzlab.mylauncher.ui.layouts.Workspace
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var presenter: LauncherViewContract.Presenter
-    lateinit var workspace: Workspace
-    lateinit var dragController: DragController
+    private lateinit var workspace: Workspace
+    private lateinit var dragController: DragController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

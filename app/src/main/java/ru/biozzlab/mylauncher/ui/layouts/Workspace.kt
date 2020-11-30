@@ -191,13 +191,5 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragView.visibility = View.VISIBLE
     }
 
-    override fun getHitRect(rect: Rect) {
-        rect.set(0, 0, displaySize.x, displaySize.y)
-    }
-
-    override fun getLocationInDragLayer(location: MutableList<Float>) {
-        (parent as DragLayer).getLocationInDragLayer(this, location)
-    }
-
     private fun getCurrentDragTargetLayout(): CellLayout = getChildAt(currentPage) as CellLayout
 }
