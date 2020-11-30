@@ -52,6 +52,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         dragController = DragController(this)
 
+        workspace.setup(dragController)
         dragLayer.setup(this, dragController)
     }
 
@@ -78,12 +79,15 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
         val view = layoutInflater.inflate(R.layout.item_application, parent, false) as AppCompatTextView
         view.setOnClickListener { openApp(item.intent) }
+        view.setOnLongClickListener { workspace.startDrag(it, item); return@setOnLongClickListener false }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
 
         val name = packageManager.getActivityInfo(ComponentName(item.packageName, item.className), 0).loadLabel(packageManager).toString()
         item.title = name
 
         view.text = item.title
+        view.tag = item
+
         return view
     }
 

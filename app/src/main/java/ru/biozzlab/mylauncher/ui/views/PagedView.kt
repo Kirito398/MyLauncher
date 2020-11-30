@@ -1,6 +1,7 @@
 package ru.biozzlab.mylauncher.ui.views
 
 import android.content.Context
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.*
 import android.widget.Scroller
@@ -24,7 +25,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
     private var layoutScale = 1.0F
     private var nextPage = -1
-    private var currentPage = 0
+    protected var currentPage = 0
     private var pageSpacingValue: Int = 0
     private var isFirstLayout = true
 
@@ -306,6 +307,18 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         invalidateCachedOffsets()
     }
 
+    override fun dispatchDraw(canvas: Canvas?) {
+        canvas?.let {
+            it.save()
+            it.clipRect(scrollX, scrollY, scrollX + right - left, scrollY + bottom - top)
+
+            for (i in childCount - 1 downTo 0) {
+                val child = getChildAt(i)
+                drawChild(it, child, drawingTime)
+            }
+            it.restore()
+        }
+    }
 
     private fun getScaledMeasuredWidth(child: View): Int {
         val measuredWidth = child.measuredWidth

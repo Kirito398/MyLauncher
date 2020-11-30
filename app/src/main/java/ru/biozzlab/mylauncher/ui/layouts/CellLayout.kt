@@ -1,15 +1,20 @@
 package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
+import androidx.core.view.marginEnd
+import androidx.core.view.marginLeft
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     : ViewGroup(context, attributeSet, defStyle) {
@@ -19,6 +24,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     companion object {
         const val DEFAULT_COLUMN_COUNT = 4
         const val DEFAULT_ROW_COUNT = 4
+        const val DRAG_OUTLINE_PAINT_ALPHA = 125
     }
 
     private var columnCount: Int = -1
@@ -30,10 +36,15 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var isDragOverlapping = false
 
     private var interceptTouchListener: OnTouchListener? = null
+    private var dragOutlineBitmap: Bitmap? = null
+    private var dragOutlineRect: Rect = Rect(-1, -1, -1, -1)
+    private var dragOutlinePaint: Paint
 
     private val container: CellContainer = CellContainer(context)
 
     init {
+        setWillNotDraw(false)
+
         val attrs = context.obtainStyledAttributes(attributeSet, CellLayout)
         cellWidth = attrs.getDimensionPixelSize(R.styleable.CellLayout_cellWidth, 10)
         cellHeight = attrs.getDimensionPixelSize(R.styleable.CellLayout_cellHeight, 10)
@@ -43,6 +54,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
         columnCount = DEFAULT_COLUMN_COUNT
         rowCount = DEFAULT_ROW_COUNT
+
+        dragOutlinePaint = Paint()
+        dragOutlinePaint.alpha = DRAG_OUTLINE_PAINT_ALPHA
 
         container.setCellDimensions(cellWidth, cellHeight, widthGap, heightGap)
         container.setColumnCount(columnCount)
@@ -74,6 +88,70 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         rowCount = y
         container.setColumnCount(columnCount)
         requestLayout()
+    }
+
+    fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect) {
+        cellToPoint(position[0], position[1], position)
+
+        val left = position[0] + (cellWidth - dragRegion.width()) / 2
+        val top = position[1]
+
+        dragOutlineBitmap = bitmap
+        dragOutlineRect.set(left, top, left + dragOutlineBitmap!!.width, top + dragOutlineBitmap!!.height)
+
+        invalidate() //TODO проверить как это сделано в исходниках
+    }
+
+    fun deleteDragOutlineBitmap() {
+        dragOutlineBitmap = null
+        dragOutlineRect.set(0, 0, 0, 0)
+        invalidate() //TODO проверить как это сделано в исходниках
+    }
+
+    private fun cellToPoint(cellX: Int, cellY: Int, position: MutableList<Int>) {
+        position[0] = paddingLeft + cellX * (cellWidth + widthGap)
+        position[1] = paddingTop + cellY * (cellHeight + heightGap)
+    }
+
+    fun findNearestArea(x: Float, y: Float): MutableList<Int> {
+        var minDistance = Double.MAX_VALUE
+        val point = mutableListOf(-1, -1)
+
+        for (row in 0 until rowCount) {
+            for (column in 0 until columnCount) {
+                val cellPosition = mutableListOf(-1, -1)
+                cellToPoint(column, row, cellPosition)
+
+                val distance = sqrt((cellPosition[0] - x).toDouble().pow(2.0) + (cellPosition[1] - y).toDouble().pow(2.0))
+
+                if (distance >= minDistance) continue
+
+                minDistance = distance
+                point[0] = column
+                point[1] = row
+            }
+        }
+
+        return point
+    }
+
+    override fun onDraw(canvas: Canvas?) {
+        //val rect = Rect()
+
+        //scaleRectAboutCenter(dragOutlineRect, rect, 1.0F)
+
+        dragOutlineBitmap?.let {
+            canvas?.drawBitmap(it, null, dragOutlineRect, dragOutlinePaint)
+        }
+    }
+
+    private fun scaleRectAboutCenter(dragOutlineRect: Rect, rect: Rect, scale: Float) {
+        val centerX = dragOutlineRect.centerX()
+        val centerY = dragOutlineRect.centerY()
+
+        rect.set(dragOutlineRect)
+        rect.offset(-centerX, -centerY)
+        rect.offset(centerX, centerY)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

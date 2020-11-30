@@ -1,15 +1,142 @@
 package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
+import ru.biozzlab.mylauncher.R
+import ru.biozzlab.mylauncher.controllers.DragController
+import ru.biozzlab.mylauncher.domain.models.DragObject
+import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.ui.Launcher
+import ru.biozzlab.mylauncher.ui.interfaces.DragSource
+import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
+import ru.biozzlab.mylauncher.ui.views.DragView
 import ru.biozzlab.mylauncher.ui.views.PagedView
-import java.lang.IllegalArgumentException
+import kotlin.math.round
 
-class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : PagedView(context, attributeSet, defStyle), View.OnTouchListener {
+class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : PagedView(
+    context,
+    attributeSet,
+    defStyle
+), View.OnTouchListener, DragSource, DropTarget {
 
     constructor(context: Context, attributeSet: AttributeSet) : this(context, attributeSet, 0)
+
+    companion object {
+        const val DRAG_BITMAP_PADDING = 2
+    }
+
+    private lateinit var item: ItemShortcut
+    private lateinit var dragOutline: Bitmap
+    private lateinit var dragController: DragController
+    private lateinit var dragTargetLayout: CellLayout
+
+    private var displaySize = Point()
+
+    init {
+        (context as Launcher).windowManager.defaultDisplay.getSize(displaySize)
+        //dragTargetLayout = getCurrentDragTargetLayout()
+    }
+
+    fun setup(dragController: DragController) {
+        this.dragController = dragController
+        dragController.setDropTarget(this)
+    }
+
+    fun startDrag(view: View, item: ItemShortcut) {
+        if (!view.isInTouchMode) return
+        view.visibility = View.INVISIBLE
+        this.item = item
+
+        //dragOutline = createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
+        dragOutline = item.iconBitmap!!
+
+        beginDragShared(view)
+    }
+
+    private fun beginDragShared(view: View) {
+        val bitmap = createDragBitmap(view, Canvas(), DRAG_BITMAP_PADDING)
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val dragLayer = (parent as DragLayer)
+        val location = mutableListOf<Float>()
+        val scale = dragLayer.getLocationInDragLayer(view, location)
+        val dragLayerX = round(location[0] - (width - scale * view.width) / 2).toInt()
+        val dragLayerY = round(location[1] - (height - scale * height) / 2 - DRAG_BITMAP_PADDING / 2).toInt()
+
+        dragController.startDrag(
+            context,
+            dragLayer,
+            bitmap,
+            dragLayerX,
+            dragLayerY,
+            this,
+            DragController.DragAction.MOVE,
+            scale
+        )
+        bitmap.recycle()
+    }
+
+    private fun createDragBitmap(view: View, canvas: Canvas, dragBitmapPadding: Int): Bitmap {
+        val bitmap = if (view is TextView) {
+            val drawable = view.compoundDrawables[1]
+            Bitmap.createBitmap(
+                drawable.intrinsicWidth + dragBitmapPadding,
+                drawable.intrinsicHeight + dragBitmapPadding,
+                Bitmap.Config.ARGB_8888
+            )
+        } else {
+            Bitmap.createBitmap(
+                view.width + dragBitmapPadding,
+                view.height + dragBitmapPadding,
+                Bitmap.Config.ARGB_8888
+            )
+        }
+
+        canvas.setBitmap(bitmap)
+        drawDragView(view, canvas, dragBitmapPadding, true)
+        canvas.setBitmap(null)
+
+        return bitmap
+    }
+
+    private fun drawDragView(view: View, canvas: Canvas, padding: Int, pruneToDrawable: Boolean) {
+        val clipRect = Rect()
+        view.getDrawingRect(clipRect)
+
+        canvas.save()
+        if (view is TextView && pruneToDrawable) {
+            val drawable = view.compoundDrawables[1]
+            clipRect.set(
+                0,
+                0,
+                drawable.intrinsicWidth + padding,
+                drawable.intrinsicHeight + padding
+            )
+            canvas.translate(padding / 2F, padding / 2F)
+            drawable.draw(canvas)
+        }
+        canvas.restore()
+    }
+
+    private fun createDragOutline(view: View, canvas: Canvas, padding: Int): Bitmap {
+        //val outlineColor = resources.getColor(android.R.color.white)
+        val bitmap = Bitmap.createBitmap(
+            view.width + padding,
+            view.height + padding,
+            Bitmap.Config.ARGB_8888
+        )
+
+        canvas.setBitmap(bitmap)
+        drawDragView(view, canvas, padding, true)
+        canvas.setBitmap(null)
+
+        return bitmap
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -30,4 +157,54 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         return false
     }
+
+    override fun onDropComplete(
+        target: View,
+        dragObject: DragObject,
+        isFlingToDelete: Boolean,
+        success: Boolean
+    ) {
+        //if (!success) return
+        //if (target != this) //TODO удаление
+        dragTargetLayout.deleteDragOutlineBitmap()
+    }
+
+    override fun onDragExit(dragObject: DragObject) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDragOver(dragObject: DragObject) {
+        dragTargetLayout = getCurrentDragTargetLayout()
+
+        dragObject.dragView?.let {
+            val dragViewVisualCenter = getDragViewVisualCenter(dragObject.x, dragObject.y, it)
+            val targetPosition = dragTargetLayout.findNearestArea(dragViewVisualCenter[0], dragViewVisualCenter[1])
+            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetPosition, it.dragRegion)
+        }
+    }
+
+    private fun getDragViewVisualCenter(x: Int, y: Int, dragView: DragView): MutableList<Float> =
+        mutableListOf(
+            x + dragView.dragRegion.width() / 2.0F,
+            y + dragView.dragRegion.height() / 2.0F
+        )
+
+    override fun acceptDrop(dragObject: DragObject): Boolean {
+        //TODO("Not yet implemented")
+        return true
+    }
+
+    override fun onDrop(dragObject: DragObject) {
+
+    }
+
+    override fun getHitRect(rect: Rect) {
+        rect.set(0, 0, displaySize.x, displaySize.y)
+    }
+
+    override fun getLocationInDragLayer(location: MutableList<Float>) {
+        (parent as DragLayer).getLocationInDragLayer(this, location)
+    }
+
+    private fun getCurrentDragTargetLayout(): CellLayout = getChildAt(currentPage) as CellLayout
 }
