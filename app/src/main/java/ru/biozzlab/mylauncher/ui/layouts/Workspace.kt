@@ -35,9 +35,15 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
     private var dropTargetCell = mutableListOf(-1, -1)
 
+    private var onShortcutDataChangedListener: ((ItemShortcut) -> Unit)? = null
+
     fun setup(dragController: DragController) {
         this.dragController = dragController
         dragController.setDropTarget(this)
+    }
+
+    fun setOnShortcutDataChangedListener(func: (ItemShortcut) -> Unit) {
+        onShortcutDataChangedListener = func
     }
 
     fun startDrag(view: View) {
@@ -183,6 +189,16 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         layoutParams.isDropped = true
 
         dragView.requestLayout()
+
+        updateShortcut()
+    }
+
+    private fun updateShortcut() {
+        val shortcutItem = dragView.tag as ItemShortcut
+        shortcutItem.cellX = dropTargetCell[0]
+        shortcutItem.cellY = dropTargetCell[1]
+
+        onShortcutDataChangedListener?.invoke(shortcutItem)
     }
 
     override fun onDropComplete(

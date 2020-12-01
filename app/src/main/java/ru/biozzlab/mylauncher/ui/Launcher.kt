@@ -17,6 +17,7 @@ import ru.biozzlab.mylauncher.cache.RoomManager
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.data.RepositoryImpl
 import ru.biozzlab.mylauncher.domain.interactor.LoadCells
+import ru.biozzlab.mylauncher.domain.interactor.UpdateShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
@@ -34,7 +35,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = LauncherPresenter(LoadCells(RepositoryImpl(CacheImpl(RoomManager.getClient(applicationContext)))))
+        val repository = RepositoryImpl(CacheImpl(RoomManager.getClient(applicationContext)))
+
+        presenter = LauncherPresenter(LoadCells(repository), UpdateShortcut(repository))
         presenter.setView(this)
         presenter.init()
     }
@@ -50,10 +53,14 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun initViews() {
         workspace = workspaceView
 
-        dragController = DragController(this)
+        dragController = DragController()
 
         workspace.setup(dragController)
-        dragLayer.setup(this, dragController)
+        dragLayer.setup(dragController)
+    }
+
+    override fun setListeners() {
+        workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
     }
 
     override fun addShortcut(item: ItemShortcut) {

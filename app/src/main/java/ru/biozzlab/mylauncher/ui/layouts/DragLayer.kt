@@ -6,15 +6,12 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import ru.biozzlab.mylauncher.controllers.DragController
-import ru.biozzlab.mylauncher.ui.Launcher
 import kotlin.math.round
 
 class DragLayer(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
-    private lateinit var launcher: Launcher
     private lateinit var controller: DragController
 
-    fun setup(launcher: Launcher, controller: DragController) {
-        this.launcher = launcher
+    fun setup(controller: DragController) {
         this.controller = controller
     }
 

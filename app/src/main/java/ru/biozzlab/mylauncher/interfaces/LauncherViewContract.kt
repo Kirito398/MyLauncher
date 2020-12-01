@@ -8,11 +8,13 @@ interface LauncherViewContract {
         fun checkForLocaleChanged()
         fun setContentView()
         fun initViews()
+        fun setListeners()
         fun addShortcut(item: ItemShortcut)
     }
 
     interface Presenter : LifecycleObserver {
         fun setView(view: View)
         fun init()
+        fun onItemShortcutDataChanged(item: ItemShortcut)
     }
 }

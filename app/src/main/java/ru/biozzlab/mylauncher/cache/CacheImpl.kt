@@ -11,6 +11,11 @@ class CacheImpl(private val roomManager: RoomManager) : Cache {
     override fun loadShortcuts(): Either<None, List<ItemCell>>
             = convertEntitiesToModel(roomManager.cellDao().getAllCells())
 
+    override fun updateShortcut(shortcut: ItemCell): Either<None, None> {
+        roomManager.cellDao().update(convertModelToEntities(shortcut))
+        return Either.Right(None())
+    }
+
     private fun convertEntitiesToModel(entities: List<CellEntity>): Either<None, List<ItemCell>> {
         val list = mutableListOf<ItemCell>()
         for (entity in entities)
@@ -26,5 +31,20 @@ class CacheImpl(private val roomManager: RoomManager) : Cache {
                 )
             )
         return Either.Right(list)
+    }
+
+    private fun convertModelToEntities(model: ItemCell): CellEntity {
+        val entity = CellEntity(
+            model.packageName,
+            model.className,
+            model.container.id,
+            model.cellX,
+            model.cellY,
+            model.desktopNumber
+        )
+
+        entity.id = model.id
+
+        return entity
     }
 }

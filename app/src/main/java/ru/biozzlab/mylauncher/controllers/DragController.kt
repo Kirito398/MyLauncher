@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import ru.biozzlab.mylauncher.domain.models.DragObject
-import ru.biozzlab.mylauncher.ui.Launcher
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
@@ -14,7 +13,7 @@ import ru.biozzlab.mylauncher.ui.views.DragView
 import kotlin.math.max
 import kotlin.math.min
 
-class DragController(private val launcher: Launcher) {
+class DragController() {
 
     private var isDragging = false
     private var motionDownX = 0
