@@ -1,17 +1,11 @@
 package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Rect
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import ru.biozzlab.mylauncher.App
-import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.controllers.DragController
-import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.ui.Launcher
 import kotlin.math.round
 

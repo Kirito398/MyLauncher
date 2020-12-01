@@ -6,14 +6,13 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
-import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.controllers.DragController
+import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
-import ru.biozzlab.mylauncher.ui.Launcher
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
-import ru.biozzlab.mylauncher.ui.views.DragView
+import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.views.PagedView
 import kotlin.math.round
 
@@ -34,11 +33,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     private lateinit var dragController: DragController
     private lateinit var dragTargetLayout: CellLayout
 
-    private var displaySize = Point()
-
-    init {
-        (context as Launcher).windowManager.defaultDisplay.getSize(displaySize)
-    }
+    private var dropTargetCell = mutableListOf(-1, -1)
 
     fun setup(dragController: DragController) {
         this.dragController = dragController
@@ -157,28 +152,18 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         return false
     }
 
-    override fun onDropComplete(
-        target: View,
-        dragObject: DragObject,
-        isFlingToDelete: Boolean,
-        success: Boolean
-    ) {
-        //if (!success) return
-        //if (target != this) //TODO удаление
-        dragTargetLayout.deleteDragOutlineBitmap()
-    }
-
-    override fun onDragExit(dragObject: DragObject) {
-        //TODO("Not yet implemented")
-    }
-
     override fun onDragOver(dragObject: DragObject) {
         dragTargetLayout = getCurrentDragTargetLayout()
 
         dragObject.dragView?.let {
-            val targetPosition = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y)
-            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetPosition, it.dragRegion)
+            val targetCell = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y)
+            dropTargetCell.copy(targetCell)
+            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetCell, it.dragRegion)
         }
+    }
+
+    override fun onDragExit(dragObject: DragObject) {
+        dragTargetLayout.deleteDragOutlineBitmap()
     }
 
     override fun acceptDrop(dragObject: DragObject): Boolean {
@@ -189,6 +174,24 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     override fun onDrop(dragObject: DragObject) {
         dragObject.deferDragViewCleanupPostAnimation = false
         dragView.visibility = View.VISIBLE
+
+        if (dropTargetCell[0] < 0 || dropTargetCell[1] < 0) return
+
+        val layoutParams = dragView.layoutParams as CellLayoutParams
+        layoutParams.cellX = dropTargetCell[0]
+        layoutParams.cellY = dropTargetCell[1]
+        layoutParams.isDropped = true
+
+        dragView.requestLayout()
+    }
+
+    override fun onDropComplete(
+        target: View,
+        dragObject: DragObject,
+        isFlingToDelete: Boolean,
+        success: Boolean
+    ) {
+        //TODO("Not yet implemented")
     }
 
     private fun getCurrentDragTargetLayout(): CellLayout = getChildAt(currentPage) as CellLayout

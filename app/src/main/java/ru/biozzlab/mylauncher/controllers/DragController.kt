@@ -2,7 +2,6 @@ package ru.biozzlab.mylauncher.controllers
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Point
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View

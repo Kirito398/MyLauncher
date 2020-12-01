@@ -6,10 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.children
-import androidx.core.view.marginEnd
-import androidx.core.view.marginLeft
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
