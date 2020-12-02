@@ -9,7 +9,7 @@ open class ItemCell(
     val className: String,
     var cellX: Int,
     var cellY: Int,
-    val desktopNumber: Int = 0,
+    var desktopNumber: Int = 0,
     val cellHSpan: Int = 1,
     val cellVSpan: Int = 1
 )

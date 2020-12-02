@@ -10,6 +10,7 @@ import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
@@ -20,7 +21,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     context,
     attributeSet,
     defStyle
-), View.OnTouchListener, DragSource, DropTarget {
+), View.OnTouchListener, DragSource, DropTarget, DragScroller {
 
     constructor(context: Context, attributeSet: AttributeSet) : this(context, attributeSet, 0)
 
@@ -40,6 +41,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     fun setup(dragController: DragController) {
         this.dragController = dragController
         dragController.setDropTarget(this)
+        dragController.setDragScroller(this)
     }
 
     fun setOnShortcutDataChangedListener(func: (ItemShortcut) -> Unit) {
@@ -188,17 +190,29 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         layoutParams.cellY = dropTargetCell[1]
         layoutParams.isDropped = true
 
-        dragView.requestLayout()
-
         updateShortcut()
+        dragView.requestLayout()
     }
 
     private fun updateShortcut() {
         val shortcutItem = dragView.tag as ItemShortcut
+
+        if (currentPage != shortcutItem.desktopNumber)
+            moveShortcut(dragView)
+
         shortcutItem.cellX = dropTargetCell[0]
         shortcutItem.cellY = dropTargetCell[1]
+        shortcutItem.desktopNumber = currentPage
 
         onShortcutDataChangedListener?.invoke(shortcutItem)
+    }
+
+    private fun moveShortcut(view: View) {
+        val fromLayout = view.parent as CellContainer
+        val toLayout = getChildAt(currentPage) as CellLayout
+
+        fromLayout.removeView(view)
+        toLayout.addViewToCell(view, -1, view.id, view.layoutParams as CellLayoutParams, false)
     }
 
     override fun onDropComplete(
@@ -211,4 +225,14 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     }
 
     private fun getCurrentDragTargetLayout(): CellLayout = getChildAt(currentPage) as CellLayout
+
+    override fun onEnterScrollArea(x: Int, y: Int, direction: Int): Boolean {
+        val result = if (direction == 0) scrollLeft() else scrollRight()
+        if (result) dragTargetLayout.deleteDragOutlineBitmap()
+        return result
+    }
+
+    override fun onExitScrollArea(): Boolean {
+        TODO("Not yet implemented")
+    }
 }

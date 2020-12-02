@@ -13,11 +13,11 @@ class DragView(context: Context) : View(context) {
 
     private lateinit var bitmap: Bitmap
     private lateinit var paint: Paint
-    private lateinit var dragLayer: DragLayer
     private var registrationX = -1
     private var registrationY = -1
 
     lateinit var dragRegion: Rect
+    lateinit var dragLayer: DragLayer
 
     constructor(context: Context, dragLayer: DragLayer, bitmap: Bitmap, registrationX: Int, registrationY: Int, left: Int, top: Int, width: Int, height: Int, initialScale: Float): this(context) {
         scaleX = initialScale

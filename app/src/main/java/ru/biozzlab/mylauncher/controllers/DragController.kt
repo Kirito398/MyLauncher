@@ -6,21 +6,31 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import ru.biozzlab.mylauncher.domain.models.DragObject
+import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.views.DragView
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class DragController() {
+class DragController {
+
+    companion object {
+        const val SCROLL_ZONE = 40
+        const val SCROLL_WAITING_TIME = 500
+    }
 
     private var isDragging = false
     private var motionDownX = 0
     private var motionDownY = 0
 
+    private var lastScrollingTime = 0L
+
     private lateinit var dragObject: DragObject
     private lateinit var dropTarget: DropTarget
+    private lateinit var dragScroller: DragScroller
 
     enum class DragAction(id: Int) {
         MOVE(0),
@@ -29,6 +39,10 @@ class DragController() {
 
     fun setDropTarget(target: DropTarget) {
         dropTarget = target
+    }
+
+    fun setDragScroller(scroller: DragScroller) {
+        dragScroller = scroller
     }
 
     fun startDrag(context: Context, dragLayer: DragLayer, bitmap: Bitmap, dragLayerX: Int, dragLayerY: Int,
@@ -92,6 +106,26 @@ class DragController() {
         dragObject.x = x
         dragObject.y = y
         dropTarget.onDragOver(dragObject)
+
+        checkScrollState(x, y)
+    }
+
+    private fun checkScrollState(x: Int, y: Int) {
+        val currentTime = System.currentTimeMillis()
+        val delta = abs(lastScrollingTime - currentTime)
+        val isScrollWaiting = delta < SCROLL_WAITING_TIME
+
+        if (isScrollWaiting) return
+
+        val dragLayer = dragObject.dragView?.dragLayer ?: return
+
+        when {
+            x < SCROLL_ZONE ->
+                if (dragScroller.onEnterScrollArea(x, y, 0)) lastScrollingTime = currentTime
+
+            x > dragLayer.width - SCROLL_ZONE ->
+                if (dragScroller.onEnterScrollArea(x, y, 1)) lastScrollingTime = currentTime
+        }
     }
 
     private fun drop(x: Int, y: Int) {

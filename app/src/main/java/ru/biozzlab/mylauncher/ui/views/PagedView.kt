@@ -219,6 +219,18 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         invalidate()
     }
 
+    protected fun scrollLeft(): Boolean {
+        if (currentPage == 0) return false
+        snapToPage(currentPage - 1)
+        return true
+    }
+
+    protected fun scrollRight(): Boolean {
+        if (currentPage >= childCount) return false
+        snapToPage(currentPage + 1)
+        return true
+    }
+
     override fun scrollTo(x: Int, y: Int) {
         super.scrollTo(x, y)
         unboundedScrollX = x
