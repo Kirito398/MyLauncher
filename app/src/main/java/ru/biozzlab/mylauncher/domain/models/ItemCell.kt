@@ -4,7 +4,7 @@ import ru.biozzlab.mylauncher.domain.types.ContainerType
 
 open class ItemCell(
     val id: Long,
-    val container: ContainerType,
+    var container: ContainerType,
     val packageName: String,
     val className: String,
     var cellX: Int,

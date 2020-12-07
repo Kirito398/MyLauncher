@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
@@ -39,6 +41,8 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
     private val container: CellContainer = CellContainer(context)
 
+    var isHotSeat = false
+
     init {
         setWillNotDraw(false)
 
@@ -67,6 +71,11 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     fun addViewToCell(view: View, index: Int, id: Int, params: CellLayoutParams, markCells: Boolean): Boolean {
         view.scaleX = 1.0F
         view.scaleY = 1.0F
+
+        if (params.showText)
+            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.workspace_icon_text_color))
+        else
+            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.hot_seat_text_color))
 
         if (params.cellX >= 0 && params.cellX <= columnCount - 1 && params.cellY >= 0 && params.cellY <= rowCount - 1) {
             if (params.cellHSpan < 0) params.cellHSpan = columnCount
@@ -113,9 +122,12 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     fun findNearestArea(x: Int, y: Int): MutableList<Int> {
         var minDistance = Double.MAX_VALUE
         val point = mutableListOf(-1, -1)
+        val cellPositions = getCellsPosition()
 
         for (row in 0 until rowCount) {
             for (column in 0 until columnCount) {
+                if (cellPositions.contains(Pair(column, row))) continue
+
                 val cellPosition = mutableListOf(-1, -1)
                 cellToPoint(column, row, cellPosition)
 
@@ -133,6 +145,18 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         }
 
         return point
+    }
+
+    private fun getCellsPosition(): MutableList<Pair<Int, Int>> {
+        val positions = mutableListOf<Pair<Int, Int>>()
+
+        for (child in container.children) {
+            if (child.visibility != View.VISIBLE) continue
+            val params = child.layoutParams as CellLayoutParams
+            positions.add(Pair(params.cellX, params.cellY))
+        }
+
+        return positions
     }
 
     override fun onDraw(canvas: Canvas?) {

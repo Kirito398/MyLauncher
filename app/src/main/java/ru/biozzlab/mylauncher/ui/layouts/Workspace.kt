@@ -10,6 +10,7 @@ import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
@@ -37,11 +38,16 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     private var dropTargetCell = mutableListOf(-1, -1)
 
     private var onShortcutDataChangedListener: ((ItemShortcut) -> Unit)? = null
+    private var hotSeat: HotSeat? = null
 
     fun setup(dragController: DragController) {
         this.dragController = dragController
         dragController.setDropTarget(this)
         dragController.setDragScroller(this)
+    }
+
+    fun setHotSeat(hotSeat: HotSeat) {
+        this.hotSeat = hotSeat
     }
 
     fun setOnShortcutDataChangedListener(func: (ItemShortcut) -> Unit) {
@@ -161,7 +167,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     }
 
     override fun onDragOver(dragObject: DragObject) {
-        dragTargetLayout = getCurrentDragTargetLayout()
+        dragTargetLayout = getCurrentDragTargetLayout(dragObject)
 
         dragObject.dragView?.let {
             val targetCell = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y)
@@ -171,13 +177,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     }
 
     override fun onDragExit(dragObject: DragObject) {
-        dragTargetLayout.deleteDragOutlineBitmap()
+        //dragTargetLayout.deleteDragOutlineBitmap()
     }
 
-    override fun acceptDrop(dragObject: DragObject): Boolean {
-        //TODO("Not yet implemented")
-        return true
-    }
+    override fun acceptDrop(dragObject: DragObject): Boolean = true
 
     override fun onDrop(dragObject: DragObject) {
         dragObject.deferDragViewCleanupPostAnimation = false
@@ -189,6 +192,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         layoutParams.cellX = dropTargetCell[0]
         layoutParams.cellY = dropTargetCell[1]
         layoutParams.isDropped = true
+        layoutParams.showText = !dragTargetLayout.isHotSeat
 
         updateShortcut()
         dragView.requestLayout()
@@ -197,19 +201,20 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     private fun updateShortcut() {
         val shortcutItem = dragView.tag as ItemShortcut
 
-        if (currentPage != shortcutItem.desktopNumber)
+        //if (currentPage != shortcutItem.desktopNumber || dragTargetLayout.isHotSeat)
             moveShortcut(dragView)
 
         shortcutItem.cellX = dropTargetCell[0]
         shortcutItem.cellY = dropTargetCell[1]
         shortcutItem.desktopNumber = currentPage
+        shortcutItem.container = if (dragTargetLayout.isHotSeat) ContainerType.HOT_SEAT else ContainerType.DESKTOP
 
         onShortcutDataChangedListener?.invoke(shortcutItem)
     }
 
     private fun moveShortcut(view: View) {
         val fromLayout = view.parent as CellContainer
-        val toLayout = getChildAt(currentPage) as CellLayout
+        val toLayout = dragTargetLayout
 
         fromLayout.removeView(view)
         toLayout.addViewToCell(view, -1, view.id, view.layoutParams as CellLayoutParams, false)
@@ -224,13 +229,24 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         //TODO("Not yet implemented")
     }
 
-    private fun getCurrentDragTargetLayout(): CellLayout = getChildAt(currentPage) as CellLayout
+    private fun getCurrentDragTargetLayout(dragObject: DragObject): CellLayout {
+        var layout = getChildAt(currentPage) as CellLayout
 
-    override fun onEnterScrollArea(x: Int, y: Int, direction: Int): Boolean {
-        val result = if (direction == 0) scrollLeft() else scrollRight()
-        if (result) dragTargetLayout.deleteDragOutlineBitmap()
-        return result
+        hotSeat?.let {
+            val hitRect = Rect()
+            it.getHitRect(hitRect)
+
+            if (hitRect.contains(dragObject.x, dragObject.y))
+                layout = it.getCellLayout()
+        }
+
+        if (::dragTargetLayout.isInitialized && dragTargetLayout != layout)
+            dragTargetLayout.deleteDragOutlineBitmap()
+
+        return layout
     }
+
+    override fun onEnterScrollArea(x: Int, y: Int, direction: Int): Boolean = if (direction == 0) scrollLeft() else scrollRight()
 
     override fun onExitScrollArea(): Boolean {
         TODO("Not yet implemented")

@@ -24,6 +24,7 @@ import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
+import ru.biozzlab.mylauncher.ui.layouts.HotSeat
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
 
@@ -56,6 +57,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         dragController = DragController()
 
         workspace.setup(dragController)
+        workspace.setHotSeat(hotSeat as HotSeat)
         dragLayer.setup(dragController)
     }
 
@@ -77,8 +79,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         params.cellHSpan = item.cellHSpan
         params.cellVSpan = item.cellVSpan
 
-        if (item.container == ContainerType.HOT_SEAT)
-            (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
+        if (item.container == ContainerType.HOT_SEAT) params.showText = false
 
         layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
     }

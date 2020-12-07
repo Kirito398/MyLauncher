@@ -30,8 +30,11 @@ class HotSeat : FrameLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
         hotSeatContent.setGridSize(cellCountX, cellCountY)
+        hotSeatContent.isHotSeat = true
         resetLayout()
     }
+
+    fun getCellLayout(): CellLayout = hotSeatContent
 
     private fun resetLayout() {
         hotSeatContent.removeAllViewsInLayout()
