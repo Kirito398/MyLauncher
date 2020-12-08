@@ -74,6 +74,6 @@ class CellContainer(context: Context, attributeSet: AttributeSet?, defStyle: Int
     }
 
     private fun invertLayoutHorizontally(): Boolean {
-        return true
+        return false
     }
 }

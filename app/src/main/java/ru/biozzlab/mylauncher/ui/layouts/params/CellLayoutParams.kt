@@ -13,6 +13,7 @@ class CellLayoutParams : ViewGroup.MarginLayoutParams {
     var cellVSpan = -1
     var isDropped = false
     var isLookedToGrid = true
+    var showText = true
 
     constructor(context: Context, attributeSet: AttributeSet?) : super(context, attributeSet)
     constructor(source: ViewGroup.LayoutParams?) : super(source)

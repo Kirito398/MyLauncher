@@ -30,6 +30,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
 ) {
     lateinit var intent: Intent
     var icon: IconDrawable? = null
+    var iconBitmap: Bitmap? = null
     var title: String = ""
 
     init {
@@ -116,6 +117,8 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         icon.draw(canvas)
         icon.bounds = bounds
         canvas.setBitmap(null)
+
+        iconBitmap = bitmap
 
         return bitmap
     }

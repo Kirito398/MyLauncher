@@ -9,6 +9,9 @@ interface CellDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(cell: CellEntity)
 
+    @Update
+    fun update(cell: CellEntity)
+
     @Delete
     fun delete(cell: CellEntity)
 

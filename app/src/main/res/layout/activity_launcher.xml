@@ -59,14 +59,6 @@
             android:src="@drawable/scroll_indicator"
             android:scaleType="fitXY"/>
 
-<!--        <TextView-->
-<!--            android:id="@+id/hotSeat"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"/>-->
-
         <include
             android:id="@+id/hotSeat"
             layout="@layout/item_hotseat"

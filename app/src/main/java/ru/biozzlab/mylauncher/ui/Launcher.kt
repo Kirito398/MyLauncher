@@ -17,24 +17,28 @@ import ru.biozzlab.mylauncher.cache.RoomManager
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.data.RepositoryImpl
 import ru.biozzlab.mylauncher.domain.interactor.LoadCells
+import ru.biozzlab.mylauncher.domain.interactor.UpdateShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.presenters.LauncherPresenter
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
+import ru.biozzlab.mylauncher.ui.layouts.HotSeat
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var presenter: LauncherViewContract.Presenter
-    lateinit var workspace: Workspace
-    lateinit var dragController: DragController
+    private lateinit var workspace: Workspace
+    private lateinit var dragController: DragController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        presenter = LauncherPresenter(LoadCells(RepositoryImpl(CacheImpl(RoomManager.getClient(applicationContext)))))
+        val repository = RepositoryImpl(CacheImpl(RoomManager.getClient(applicationContext)))
+
+        presenter = LauncherPresenter(LoadCells(repository), UpdateShortcut(repository))
         presenter.setView(this)
         presenter.init()
     }
@@ -50,9 +54,15 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun initViews() {
         workspace = workspaceView
 
-        dragController = DragController(this)
+        dragController = DragController()
 
-        dragLayer.setup(this, dragController)
+        workspace.setup(dragController)
+        workspace.setHotSeat(hotSeat as HotSeat)
+        dragLayer.setup(dragController)
+    }
+
+    override fun setListeners() {
+        workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
     }
 
     override fun addShortcut(item: ItemShortcut) {
@@ -69,8 +79,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         params.cellHSpan = item.cellHSpan
         params.cellVSpan = item.cellVSpan
 
-        if (item.container == ContainerType.HOT_SEAT)
-            (shortcut as AppCompatTextView).setTextColor(ContextCompat.getColor(applicationContext, R.color.hot_seat_text_color))
+        if (item.container == ContainerType.HOT_SEAT) params.showText = false
 
         layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
     }
@@ -78,12 +87,15 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
         val view = layoutInflater.inflate(R.layout.item_application, parent, false) as AppCompatTextView
         view.setOnClickListener { openApp(item.intent) }
+        view.setOnLongClickListener { workspace.startDrag(it); return@setOnLongClickListener false }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
 
         val name = packageManager.getActivityInfo(ComponentName(item.packageName, item.className), 0).loadLabel(packageManager).toString()
         item.title = name
 
         view.text = item.title
+        view.tag = item
+
         return view
     }
 
