@@ -63,6 +63,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun setListeners() {
         workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
+        workspace.setOnShortcutLongPressListener { "LongPress!".showToast() }
     }
 
     override fun addShortcut(item: ItemShortcut) {

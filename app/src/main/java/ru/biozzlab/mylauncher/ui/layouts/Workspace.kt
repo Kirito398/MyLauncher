@@ -54,6 +54,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         onShortcutDataChangedListener = func
     }
 
+    fun setOnShortcutLongPressListener(listener: (View) -> Unit) {
+        dragController.setOnLongPressListener { listener.invoke(dragView) }
+    }
+
     fun startDrag(view: View) {
         if (!view.isInTouchMode) return
         view.visibility = View.INVISIBLE
