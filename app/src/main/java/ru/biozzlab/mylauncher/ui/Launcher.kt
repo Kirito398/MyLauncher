@@ -2,6 +2,7 @@ package ru.biozzlab.mylauncher.ui
 
 import android.content.ComponentName
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +64,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun setListeners() {
         workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
-        workspace.setOnShortcutLongPressListener { "LongPress!".showToast() }
+        workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
     }
 
     override fun addShortcut(item: ItemShortcut) {
@@ -110,6 +111,12 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 //        val launcherApp = getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps? ?: return
 //        item.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 //        launcherApp.startMainActivity(item.intent.component, item.user, item.intent.sourceBounds, null)
+    }
+
+    private fun openDeleteAppDialog(item: ItemShortcut) {
+        val packageURI = Uri.parse("package:${item.packageName}")
+        val intent = Intent(Intent.ACTION_DELETE, packageURI)
+        startActivity(intent)
     }
 
     fun getDragLayer(): DragLayer = dragLayer
