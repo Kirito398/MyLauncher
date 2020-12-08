@@ -2,9 +2,11 @@ package ru.biozzlab.mylauncher.controllers
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Point
 import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
+import ru.biozzlab.mylauncher.calculateDistance
 import ru.biozzlab.mylauncher.domain.models.DragObject
 import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
@@ -20,17 +22,22 @@ class DragController {
     companion object {
         const val SCROLL_ZONE = 40
         const val SCROLL_WAITING_TIME = 500
+        const val MAX_LONG_PRESS_DISTANCE = 10
+        const val LONG_PRESS_TIME = 700
     }
 
     private var isDragging = false
     private var motionDownX = 0
     private var motionDownY = 0
+    private var motionDownTime = -1L
 
     private var lastScrollingTime = 0L
 
     private lateinit var dragObject: DragObject
     private lateinit var dropTarget: DropTarget
     private lateinit var dragScroller: DragScroller
+
+    private var onLongPressListener: (() -> Unit)? = null
 
     enum class DragAction(id: Int) {
         MOVE(0),
@@ -43,6 +50,10 @@ class DragController {
 
     fun setDragScroller(scroller: DragScroller) {
         dragScroller = scroller
+    }
+
+    fun setOnLongPressListener(listener: () -> Unit) {
+        onLongPressListener = listener
     }
 
     fun startDrag(context: Context, dragLayer: DragLayer, bitmap: Bitmap, dragLayerX: Int, dragLayerY: Int,
@@ -59,7 +70,7 @@ class DragController {
         dragObject.dragView?.show(motionDownX, motionDownY)
     }
 
-    fun endDrag() {
+    private fun endDrag() {
         if (!isDragging) return
         isDragging = false
 
@@ -74,6 +85,7 @@ class DragController {
             MotionEvent.ACTION_DOWN -> {
                 motionDownX = position[0]
                 motionDownY = position[1]
+                motionDownTime = System.currentTimeMillis()
             }
             MotionEvent.ACTION_UP -> endDrag()
         }
@@ -90,6 +102,7 @@ class DragController {
             MotionEvent.ACTION_DOWN -> {
                 motionDownX = position[0]
                 motionDownY = position[1]
+                motionDownTime = System.currentTimeMillis()
             }
             MotionEvent.ACTION_MOVE -> handleMove(position[0], position[1])
             MotionEvent.ACTION_UP -> {
@@ -107,7 +120,19 @@ class DragController {
         dragObject.y = y
         dropTarget.onDragOver(dragObject)
 
+        checkLongPress(x, y)
         checkScrollState(x, y)
+    }
+
+    private fun checkLongPress(x: Int, y: Int) {
+        val distance = calculateDistance(Point(motionDownX, motionDownY), Point(x, y))
+        if (distance > MAX_LONG_PRESS_DISTANCE || motionDownTime < 0L) return
+
+        val deltaTime = System.currentTimeMillis() - motionDownTime
+        if (deltaTime < LONG_PRESS_TIME) return
+
+        onLongPressListener?.invoke()
+        motionDownTime = -1
     }
 
     private fun checkScrollState(x: Int, y: Int) {

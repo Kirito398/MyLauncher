@@ -54,9 +54,14 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         onShortcutDataChangedListener = func
     }
 
+    fun setOnShortcutLongPressListener(listener: (View) -> Unit) {
+        dragController.setOnLongPressListener { listener.invoke(dragView) }
+    }
+
     fun startDrag(view: View) {
         if (!view.isInTouchMode) return
         view.visibility = View.INVISIBLE
+        view.isClickable = false
         this.dragView = view
 
         //dragOutline = createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
@@ -185,6 +190,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     override fun onDrop(dragObject: DragObject) {
         dragObject.deferDragViewCleanupPostAnimation = false
         dragView.visibility = View.VISIBLE
+        dragView.isClickable = true
 
         if (dropTargetCell[0] < 0 || dropTargetCell[1] < 0) return
 

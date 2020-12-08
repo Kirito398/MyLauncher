@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
+import ru.biozzlab.mylauncher.calculateDistance
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -134,7 +135,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
                 val centerX = x - cellWidth / 2
                 val centerY = y - cellHeight / 2
 
-                val distance = sqrt((cellPosition[0] - centerX).toDouble().pow(2.0) + (cellPosition[1] - centerY).toDouble().pow(2.0))
+                val distance = calculateDistance(Point(cellPosition[0], cellPosition[1]), Point(centerX, centerY))
 
                 if (distance >= minDistance) continue
 
