@@ -44,7 +44,7 @@ class HotSeat : FrameLayout {
         allAppsButton.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(context, all_apps_button_icon), null, null)
         allAppsButton.contentDescription = "Apps"
 
-        allAppsButton.setOnClickListener { "OnAllAppsButtonClicked!".easyLog(this::class.java.simpleName) }
+        allAppsButton.setOnClickListener { "OnAllAppsButtonClicked!".easyLog(this) }
 
         val params = CellLayoutParams(menuButtonPosition, 0, 1, 1)
         hotSeatContent.addViewToCell(allAppsButton, -1, 0, params, true)
