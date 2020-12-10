@@ -7,4 +7,5 @@ import ru.bis.entities.None
 interface Cache {
     fun loadShortcuts(): Either<None, List<ItemCell>>
     fun updateShortcut(shortcut: ItemCell): Either<None, None>
+    fun getIsWorkspaceInit(): Either<None, Boolean>
 }

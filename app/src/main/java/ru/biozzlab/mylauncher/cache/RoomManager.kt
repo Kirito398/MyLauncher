@@ -59,6 +59,7 @@ abstract class RoomManager : RoomDatabase() {
                                 val desktopNumber = attrs.getInt(R.styleable.Favorite_desktopNumber, 0)
 
                                 if (id == -1 || cellX == -1 || cellY == -1) continue
+                                if (context.packageManager.getLaunchIntentForPackage(packageName) == null) continue
 
                                 addCell(db, id, packageName, className, container, cellX, cellY, desktopNumber)
                             }

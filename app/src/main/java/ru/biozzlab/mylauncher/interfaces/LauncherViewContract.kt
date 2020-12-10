@@ -1,5 +1,6 @@
 package ru.biozzlab.mylauncher.interfaces
 
+import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 
@@ -10,6 +11,7 @@ interface LauncherViewContract {
         fun initViews()
         fun setListeners()
         fun addShortcut(item: ItemShortcut)
+        fun getPackageManager(): PackageManager
     }
 
     interface Presenter : LifecycleObserver {

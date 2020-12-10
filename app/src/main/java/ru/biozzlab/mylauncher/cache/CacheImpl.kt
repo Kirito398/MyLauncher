@@ -7,7 +7,7 @@ import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.bis.entities.Either
 import ru.bis.entities.None
 
-class CacheImpl(private val roomManager: RoomManager) : Cache {
+class CacheImpl(private val roomManager: RoomManager, private val prefsManager: SharedPrefsManager) : Cache {
     override fun loadShortcuts(): Either<None, List<ItemCell>>
             = convertEntitiesToModel(roomManager.cellDao().getAllCells())
 
@@ -15,6 +15,8 @@ class CacheImpl(private val roomManager: RoomManager) : Cache {
         roomManager.cellDao().update(convertModelToEntities(shortcut))
         return Either.Right(None())
     }
+
+    override fun getIsWorkspaceInit(): Either<None, Boolean> = prefsManager.getIsWorkspaceInit()
 
     private fun convertEntitiesToModel(entities: List<CellEntity>): Either<None, List<ItemCell>> {
         val list = mutableListOf<ItemCell>()
@@ -43,7 +45,7 @@ class CacheImpl(private val roomManager: RoomManager) : Cache {
             model.desktopNumber
         )
 
-        entity.id = model.id
+        if (model.id > 0) entity.id = model.id
 
         return entity
     }
