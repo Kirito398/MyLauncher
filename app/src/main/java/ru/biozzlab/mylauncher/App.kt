@@ -8,8 +8,6 @@ import ru.biozzlab.mylauncher.di.modules.CacheModule
 
 class App : Application() {
     companion object {
-        const val WORKSPACE_IS_INIT = "workspace_is_init"
-
         var isScreenLarge: Boolean = false
         lateinit var appContext: Context
         lateinit var appComponent: AppComponent

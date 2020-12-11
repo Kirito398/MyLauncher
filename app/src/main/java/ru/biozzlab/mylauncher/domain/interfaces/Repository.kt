@@ -5,7 +5,8 @@ import ru.bis.entities.Either
 import ru.bis.entities.None
 
 interface Repository {
-    fun loadShortcuts(): Either<None, List<ItemCell>>
+    fun loadShortcuts(): Either<None, MutableList<ItemCell>>
     fun updateShortcuts(shortcut: ItemCell): Either<None, None>
     fun isWorkspaceInit(): Either<None, Boolean>
+    fun saveShortcuts(shortcuts: MutableList<ItemCell>): Either<None, MutableList<ItemCell>>
 }

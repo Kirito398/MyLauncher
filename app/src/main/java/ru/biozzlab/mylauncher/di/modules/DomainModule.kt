@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import ru.biozzlab.mylauncher.domain.interactor.IsWorkspaceInit
 import ru.biozzlab.mylauncher.domain.interactor.LoadCells
+import ru.biozzlab.mylauncher.domain.interactor.SaveShortcuts
 import ru.biozzlab.mylauncher.domain.interactor.UpdateShortcut
 import ru.biozzlab.mylauncher.domain.interfaces.Repository
 
@@ -18,4 +19,7 @@ class DomainModule {
 
     @Provides
     fun provideIsWorkspaceInit(repository: Repository): IsWorkspaceInit = IsWorkspaceInit(repository)
+
+    @Provides
+    fun provideSaveShortcuts(repository: Repository): SaveShortcuts = SaveShortcuts(repository)
 }

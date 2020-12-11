@@ -12,11 +12,13 @@ interface LauncherViewContract {
         fun setListeners()
         fun addShortcut(item: ItemShortcut)
         fun getPackageManager(): PackageManager
+        fun setWorkspaceInitProgressBarVisibility(visible: Boolean)
     }
 
     interface Presenter : LifecycleObserver {
         fun setView(view: View)
         fun init()
         fun onItemShortcutDataChanged(item: ItemShortcut)
+        fun addShortcutToUpdateQueue(item: ItemShortcut)
     }
 }
