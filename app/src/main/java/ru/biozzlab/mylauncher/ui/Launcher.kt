@@ -9,37 +9,33 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.item_hotseat.view.*
+import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
-import ru.biozzlab.mylauncher.cache.CacheImpl
-import ru.biozzlab.mylauncher.cache.RoomManager
 import ru.biozzlab.mylauncher.controllers.DragController
-import ru.biozzlab.mylauncher.data.RepositoryImpl
-import ru.biozzlab.mylauncher.domain.interactor.LoadCells
-import ru.biozzlab.mylauncher.domain.interactor.UpdateShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
-import ru.biozzlab.mylauncher.presenters.LauncherPresenter
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.HotSeat
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
+import javax.inject.Inject
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
-    private lateinit var presenter: LauncherViewContract.Presenter
+    @Inject
+    lateinit var presenter: LauncherViewContract.Presenter
+
     private lateinit var workspace: Workspace
     private lateinit var dragController: DragController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val repository = RepositoryImpl(CacheImpl(RoomManager.getClient(applicationContext)))
+        App.appComponent.injectLauncher(this)
 
-        presenter = LauncherPresenter(LoadCells(repository), UpdateShortcut(repository))
         presenter.setView(this)
         presenter.init()
     }
@@ -68,6 +64,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     override fun addShortcut(item: ItemShortcut) {
+        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
+            findAreaInCellLayoutForShortcut(item)
+
         val layout = when (item.container) {
             ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
             ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
@@ -84,6 +83,22 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (item.container == ContainerType.HOT_SEAT) params.showText = false
 
         layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
+    }
+
+    override fun setWorkspaceInitProgressBarVisibility(visible: Boolean) {
+        pbWorkspaceInit.visibility = if (visible) View.VISIBLE else View.GONE
+        workspace.visibility = if (!visible) View.VISIBLE else View.GONE
+    }
+
+    private fun findAreaInCellLayoutForShortcut(item: ItemShortcut) {
+        val position = mutableListOf(-1, -1)
+        val desktopNumber = workspace.findEmptyArea(position)
+
+        item.desktopNumber = desktopNumber
+        item.cellX = position[0]
+        item.cellY = position[1]
+
+        presenter.addShortcutToUpdateQueue(item)
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {

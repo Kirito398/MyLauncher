@@ -50,6 +50,16 @@
 
         </ru.biozzlab.mylauncher.ui.layouts.Workspace>
 
+        <ProgressBar
+            android:id="@+id/pbWorkspaceInit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/workspaceView"
+            app:layout_constraintBottom_toBottomOf="@id/workspaceView"
+            app:layout_constraintStart_toStartOf="@id/workspaceView"
+            app:layout_constraintEnd_toEndOf="@id/workspaceView"
+            android:visibility="gone"/>
+
         <ImageView
             android:id="@+id/ivPageIndicator"
             android:layout_width="wrap_content"

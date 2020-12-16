@@ -235,6 +235,24 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         //TODO("Not yet implemented")
     }
 
+    fun findEmptyArea(position: MutableList<Int>): Int {
+        var childNumber = -1
+
+        for (i in 0 until childCount) {
+            val child: CellLayout = (getChildAt(i) as CellLayout)
+            val areaPosition = child.findNearestArea(0, 0)
+
+            if (areaPosition[0] >= 0 && areaPosition[1] >= 0) {
+                position[0] = areaPosition[0]
+                position[1] = areaPosition[1]
+                childNumber = i
+                break
+            }
+        }
+
+        return childNumber
+    }
+
     private fun getCurrentDragTargetLayout(dragObject: DragObject): CellLayout {
         var layout = getChildAt(currentPage) as CellLayout
 
