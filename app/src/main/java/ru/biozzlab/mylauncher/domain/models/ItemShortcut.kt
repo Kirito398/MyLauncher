@@ -19,6 +19,7 @@ import ru.biozzlab.mylauncher.ui.views.IconDrawable
 
 class ItemShortcut(cell: ItemCell) : ItemCell(
     cell.id,
+    cell.type,
     cell.container,
     cell.packageName,
     cell.className,

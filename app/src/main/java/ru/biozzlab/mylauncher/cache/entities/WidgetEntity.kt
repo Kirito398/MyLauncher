@@ -5,8 +5,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.biozzlab.mylauncher.cache.RoomConstants
 
-@Entity(tableName = RoomConstants.TABLE_CELLS)
-data class CellEntity(
+@Entity(tableName = RoomConstants.TABLE_WIDGETS)
+data class WidgetEntity(
     @ColumnInfo(name = RoomConstants.TAG_PACKAGE_NAME)
     val packageName: String,
     @ColumnInfo(name = RoomConstants.TAG_CLASS_NAME)
@@ -18,7 +18,13 @@ data class CellEntity(
     @ColumnInfo(name = RoomConstants.TAG_CELL_Y)
     val cellY: Int,
     @ColumnInfo(name = RoomConstants.TAG_DESKTOP_NUMBER)
-    val desktopNumber: Int
+    val desktopNumber: Int,
+    @ColumnInfo(name = RoomConstants.TAG_SPAN_X)
+    val spanX: Int,
+    @ColumnInfo(name = RoomConstants.TAG_SPAN_Y)
+    val spanY: Int,
+    @ColumnInfo(name = RoomConstants.TAG_APP_WIDGET_ID)
+    val appWidgetId: Int
 ) {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = RoomConstants.TAG_ID)

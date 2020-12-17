@@ -3,6 +3,7 @@ package ru.biozzlab.mylauncher.interfaces
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.domain.models.ItemWidget
 
 interface LauncherViewContract {
     interface View {
@@ -11,6 +12,7 @@ interface LauncherViewContract {
         fun initViews()
         fun setListeners()
         fun addShortcut(item: ItemShortcut)
+        fun addWidget(widget: ItemWidget)
         fun getPackageManager(): PackageManager
         fun setWorkspaceInitProgressBarVisibility(visible: Boolean)
     }

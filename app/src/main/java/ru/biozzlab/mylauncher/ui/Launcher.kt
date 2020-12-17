@@ -15,6 +15,7 @@ import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
@@ -83,6 +84,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (item.container == ContainerType.HOT_SEAT) params.showText = false
 
         layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
+    }
+
+    override fun addWidget(widget: ItemWidget) {
+        //TODO("Not yet implemented")
     }
 
     override fun setWorkspaceInitProgressBarVisibility(visible: Boolean) {

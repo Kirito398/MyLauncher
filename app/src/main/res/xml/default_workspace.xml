@@ -23,4 +23,14 @@
         launcher:container="0"
         launcher:x="4"
         launcher:y="0" />
+
+    <appwidget
+        launcher:id="4"
+        launcher:packageName="com.android.deskclock"
+        launcher:className="com.android.alarmclock.AnalogAppWidgetProvider"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="0"
+        launcher:spanX="2"
+        launcher:spanY="2" />
 </favorites>

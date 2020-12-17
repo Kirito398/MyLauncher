@@ -1,6 +1,10 @@
 package ru.biozzlab.mylauncher.cache
 
+import android.appwidget.AppWidgetHost
+import android.content.ContentValues
 import android.content.Context
+import android.content.res.TypedArray
+import android.database.sqlite.SQLiteDatabase
 import android.util.Xml
 import androidx.room.Database
 import androidx.room.Room
@@ -8,14 +12,31 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.xmlpull.v1.XmlPullParser
 import ru.biozzlab.mylauncher.R
+import ru.biozzlab.mylauncher.cache.RoomConstants.APP_WIDGET
 import ru.biozzlab.mylauncher.cache.RoomConstants.DB_VERSION
+import ru.biozzlab.mylauncher.cache.RoomConstants.SHORTCUT
+import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_CELLS
+import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_WIDGETS
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_APP_WIDGET_ID
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_X
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_Y
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CLASS_NAME
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CONTAINER
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_DESKTOP_NUMBER
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_ID
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_PACKAGE_NAME
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_SPAN_X
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_SPAN_Y
 import ru.biozzlab.mylauncher.cache.daos.CellDao
+import ru.biozzlab.mylauncher.cache.daos.WidgetDao
 import ru.biozzlab.mylauncher.cache.entities.CellEntity
+import ru.biozzlab.mylauncher.cache.entities.WidgetEntity
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 
-@Database(entities = [CellEntity::class], version = DB_VERSION)
+@Database(entities = [CellEntity::class, WidgetEntity::class], version = DB_VERSION)
 abstract class RoomManager : RoomDatabase() {
     abstract fun cellDao(): CellDao
+    abstract fun widgetDao(): WidgetDao
 
     companion object {
         private var INSTANCE: RoomManager? = null
@@ -40,6 +61,8 @@ abstract class RoomManager : RoomDatabase() {
                                 && type != XmlPullParser.END_DOCUMENT) {
                                 if (type != XmlPullParser.START_TAG) continue
 
+                                val name = parser.name ?: continue
+
                                 val attrs = context.obtainStyledAttributes(
                                     attributeSet,
                                     R.styleable.Favorite
@@ -59,9 +82,17 @@ abstract class RoomManager : RoomDatabase() {
                                 val desktopNumber = attrs.getInt(R.styleable.Favorite_desktopNumber, 0)
 
                                 if (id == -1 || cellX == -1 || cellY == -1) continue
-                                if (context.packageManager.getLaunchIntentForPackage(packageName) == null) continue
 
-                                addCell(db, id, packageName, className, container, cellX, cellY, desktopNumber)
+                                val values = ContentValues()
+                                values.put(TAG_ID, id)
+                                values.put(TAG_PACKAGE_NAME, packageName)
+                                values.put(TAG_CLASS_NAME, className)
+                                values.put(TAG_CONTAINER, container)
+                                values.put(TAG_CELL_X, cellX)
+                                values.put(TAG_CELL_Y, cellY)
+                                values.put(TAG_DESKTOP_NUMBER, desktopNumber)
+
+                                addInDb(name, values, db, context, attrs)
                             }
                         }
                     }).build()
@@ -69,28 +100,30 @@ abstract class RoomManager : RoomDatabase() {
             return INSTANCE!!
         }
 
-        private fun addCell(
-            db: SupportSQLiteDatabase,
-            id: Int,
-            packageName: String,
-            className: String,
-            container: Int,
-            cellX: Int,
-            cellY: Int,
-            desktopNumber: Int = 0
-        ) {
-            val sqlRequest = "INSERT INTO ${RoomConstants.TABLE_CELLS} VALUES(" +
-                    "${id}, " +
-                    "'$packageName', " +
-                    "'$className', " +
-                    "$container, " +
-                    "$cellX, " +
-                    "$cellY, " +
-                    "$desktopNumber);"
+        private fun addInDb(name: String, values: ContentValues, db: SupportSQLiteDatabase, context: Context, attrs: TypedArray) {
+            when (name) {
+                SHORTCUT -> addShortcut(context, db, values)
+                APP_WIDGET -> { addAppWidget(context, db, values, attrs) }
+            }
+        }
 
-            db.execSQL(sqlRequest)
+        private fun addShortcut(context: Context, db: SupportSQLiteDatabase, values: ContentValues) {
+            if (context.packageManager.getLaunchIntentForPackage(values.getAsString(TAG_PACKAGE_NAME)) == null) return
+            db.insert(TABLE_CELLS, SQLiteDatabase.CONFLICT_REPLACE, values)
+        }
+
+        private fun addAppWidget(context: Context, db: SupportSQLiteDatabase, values: ContentValues, attrs: TypedArray) {
+            val spanX = attrs.getInt(R.styleable.Favorite_spanX, 1)
+            val spanY = attrs.getInt(R.styleable.Favorite_spanY, 1)
+
+            val appWidgetHost = AppWidgetHost(context, 1024)
+            val appWidgetId = appWidgetHost.allocateAppWidgetId()
+
+            values.put(TAG_SPAN_X, spanX)
+            values.put(TAG_SPAN_Y, spanY)
+            values.put(TAG_APP_WIDGET_ID, appWidgetId)
+
+            db.insert(TABLE_WIDGETS, SQLiteDatabase.CONFLICT_REPLACE, values)
         }
     }
-
-
 }
