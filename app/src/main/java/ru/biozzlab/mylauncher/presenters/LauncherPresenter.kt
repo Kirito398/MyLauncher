@@ -119,7 +119,7 @@ class LauncherPresenter(
         updateShortcut(UpdateShortcut.Params(item))
     }
 
-    override fun addShortcutToUpdateQueue(item: ItemShortcut) {
+    override fun addShortcutToUpdateQueue(item: ItemCell) {
         shortcutsTempList.add(item)
     }
 

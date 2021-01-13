@@ -12,7 +12,6 @@ open class ItemCell(
     var cellX: Int,
     var cellY: Int,
     var desktopNumber: Int = 0,
-    val cellHSpan: Int = 1,
-    val cellVSpan: Int = 1,
-    val appWidgetId: Int = -1
+    var cellHSpan: Int = 1,
+    var cellVSpan: Int = 1
 )

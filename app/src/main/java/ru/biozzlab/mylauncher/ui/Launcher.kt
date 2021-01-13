@@ -1,5 +1,9 @@
 package ru.biozzlab.mylauncher.ui
 
+import android.app.Activity
+import android.appwidget.AppWidgetHost
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
@@ -14,9 +18,11 @@ import kotlinx.android.synthetic.main.item_hotseat.view.*
 import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.controllers.DragController
+import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
+import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
@@ -31,6 +37,8 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     private lateinit var workspace: Workspace
     private lateinit var dragController: DragController
+    private lateinit var appWidgetHost: AppWidgetHost
+    private lateinit var appWidgetManager: AppWidgetManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,16 +65,20 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         workspace.setup(dragController)
         workspace.setHotSeat(hotSeat as HotSeat)
         dragLayer.setup(dragController)
+
+        appWidgetHost = AppWidgetHost(applicationContext, 1024)
+        appWidgetManager = AppWidgetManager.getInstance(applicationContext)
     }
 
     override fun setListeners() {
         workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
         workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
+        (hotSeat as HotSeat).setOnAllAppsButtonClickListener { selectWidget() }
     }
 
     override fun addShortcut(item: ItemShortcut) {
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
-            findAreaInCellLayoutForShortcut(item)
+            findAreaInCellLayout(item)
 
         val layout = when (item.container) {
             ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
@@ -86,18 +98,14 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         layout.addViewToCell(shortcut, -1, item.id.toInt(), params, false)
     }
 
-    override fun addWidget(widget: ItemWidget) {
-        //TODO("Not yet implemented")
-    }
-
     override fun setWorkspaceInitProgressBarVisibility(visible: Boolean) {
         pbWorkspaceInit.visibility = if (visible) View.VISIBLE else View.GONE
         workspace.visibility = if (!visible) View.VISIBLE else View.GONE
     }
 
-    private fun findAreaInCellLayoutForShortcut(item: ItemShortcut) {
+    private fun findAreaInCellLayout(item: ItemCell) {
         val position = mutableListOf(-1, -1)
-        val desktopNumber = workspace.findEmptyArea(position)
+        val desktopNumber = workspace.findEmptyArea(position, item.cellHSpan, item.cellVSpan)
 
         item.desktopNumber = desktopNumber
         item.cellX = position[0]
@@ -107,7 +115,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
-        val view = layoutInflater.inflate(R.layout.item_application, parent, false) as AppCompatTextView
+        val view = layoutInflater.inflate(R.layout.item_application, parent, false)
+                as? AppCompatTextView ?: return null
+
         view.setOnClickListener { openApp(item.intent) }
         view.setOnLongClickListener { workspace.startDrag(it); return@setOnLongClickListener false }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
@@ -143,5 +153,129 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     private fun String.showToast() {
         Toast.makeText(this@Launcher, this, Toast.LENGTH_SHORT).show()
+    }
+
+    /**-------Работа с виджетами-------*/
+    companion object {
+        private const val REQUEST_CREATE_APPWIDGET = 2
+        private const val REQUEST_BIND_APPWIDGET = 3
+        private const val REQUEST_PICK_APPWIDGET = 4
+        private const val EXTRA_APPWIDGET_MODEL = "extra_appwidget_model"
+    }
+
+    override fun addWidget(widget: ItemWidget) {
+        val appWidgetId = appWidgetHost.allocateAppWidgetId()
+
+        var widgetInfo: AppWidgetProviderInfo? = null
+        for (widgetProvider in appWidgetManager.installedProviders) {
+            if (widgetProvider.provider.className != widget.className) continue
+            widgetInfo = widgetProvider
+            break
+        }
+
+        val widgetProvider = widgetInfo?.provider ?: return
+
+        if (appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, widgetProvider)) {
+            createWidget(appWidgetId, widget)
+        } else {
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetProvider)
+                putExtra(EXTRA_APPWIDGET_MODEL, widget)
+            }
+
+            startActivityForResult(intent, REQUEST_BIND_APPWIDGET)
+        }
+    }
+
+    private fun selectWidget() {
+        val appWidgetId = appWidgetHost.allocateAppWidgetId()
+        val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK).apply {
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+        }
+        startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_BIND_APPWIDGET) {
+                data?.extras?.let {
+                    val widget = it.getParcelable<ItemWidget>(EXTRA_APPWIDGET_MODEL) ?: return@let
+                    val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+
+                    createWidget(appWidgetId, widget)
+                }
+            }
+            if (requestCode == REQUEST_PICK_APPWIDGET) {
+                data?.extras?.let {
+                    val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+                    configureWidget(appWidgetId)
+                }
+            }
+            if (requestCode == REQUEST_CREATE_APPWIDGET) {
+                data?.extras?.let {
+                    val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+                    createWidget(appWidgetId)
+                }
+            }
+        }
+    }
+
+    private fun createWidget(appWidgetId: Int, widget: ItemWidget? = null) {
+        val appWidgetInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+
+        val item = widget
+            ?: ItemCell(
+                -1,
+                WorkspaceItemType.WIDGET,
+                ContainerType.DESKTOP,
+                appWidgetInfo.provider.packageName,
+                appWidgetInfo.provider.className,
+                -1,
+                -1,
+                -1,
+                -1,
+                -1
+            )
+
+        if (item.cellHSpan < 0 || item.cellVSpan < 0)
+            (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
+
+        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
+            findAreaInCellLayout(item)
+
+        val layout = workspace.getChildAt(item.desktopNumber) as CellLayout
+        val widgetView = appWidgetHost.createView(applicationContext, appWidgetId, appWidgetInfo)
+        widgetView.setAppWidget(appWidgetId, appWidgetInfo)
+        val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
+        widgetView.layoutParams = params
+        widgetView.tag = item
+
+        layout.addViewToCell(widgetView, -1, 30, params, false)
+    }
+
+    private fun configureWidget(appWidgetId: Int) {
+        val appWidgetInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+
+        if (appWidgetInfo.configure != null) {
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
+            intent.component = appWidgetInfo.configure
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            startActivityForResult(intent, REQUEST_CREATE_APPWIDGET)
+        } else {
+            createWidget(appWidgetId)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        appWidgetHost.startListening()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        appWidgetHost.stopListening()
     }
 }

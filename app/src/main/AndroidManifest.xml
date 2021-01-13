@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.biozzlab.mylauncher">
 
+    <uses-permission android:name="android.permission.BIND_APPWIDGET" />
+
     <application
         android:name=".App"
         android:allowBackup="true"

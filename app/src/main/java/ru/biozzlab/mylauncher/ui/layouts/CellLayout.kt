@@ -12,9 +12,8 @@ import androidx.core.view.children
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.calculateDistance
+import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     : ViewGroup(context, attributeSet, defStyle) {
@@ -73,10 +72,12 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         view.scaleX = 1.0F
         view.scaleY = 1.0F
 
-        if (params.showText)
-            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.workspace_icon_text_color))
-        else
-            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.hot_seat_text_color))
+        if (view is TextView) {
+            if (params.showText)
+                view.setTextColor(ContextCompat.getColor(context, R.color.workspace_icon_text_color))
+            else
+                view.setTextColor(ContextCompat.getColor(context, R.color.hot_seat_text_color))
+        }
 
         if (params.cellX >= 0 && params.cellX <= columnCount - 1 && params.cellY >= 0 && params.cellY <= rowCount - 1) {
             if (params.cellHSpan < 0) params.cellHSpan = columnCount
@@ -120,14 +121,21 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         position[1] = paddingTop + cellY * (cellHeight + heightGap)
     }
 
-    fun findNearestArea(x: Int, y: Int): MutableList<Int> {
+    fun findNearestArea(x: Int, y: Int, spanX: Int = 1, spanY: Int = 1): MutableList<Int> {
         var minDistance = Double.MAX_VALUE
         val point = mutableListOf(-1, -1)
         val cellPositions = getCellsPosition()
 
         for (row in 0 until rowCount) {
             for (column in 0 until columnCount) {
-                if (cellPositions.contains(Pair(column, row))) continue
+                if (column + spanX - 1 > columnCount || row + spanY - 1 > rowCount) continue
+
+                var isCellEmpty = true
+                for (i in 0 until spanX)
+                    for (j in 0 until spanY)
+                        if (cellPositions.contains(Pair(column + i, row + j))) isCellEmpty = false
+
+                if (!isCellEmpty) continue
 
                 val cellPosition = mutableListOf(-1, -1)
                 cellToPoint(column, row, cellPosition)
@@ -154,7 +162,10 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         for (child in container.children) {
             if (child.visibility != View.VISIBLE) continue
             val params = child.layoutParams as CellLayoutParams
-            positions.add(Pair(params.cellX, params.cellY))
+
+            for (i in 0 until params.cellHSpan)
+                for (j in 0 until params.cellVSpan)
+                    positions.add(Pair(params.cellX + i, params.cellY + j))
         }
 
         return positions
@@ -215,4 +226,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
             = CellLayoutParams(p)
 
     override fun checkLayoutParams(p: ViewGroup.LayoutParams?): Boolean = p is CellLayoutParams
+
+    fun calculateItemDimensions(item: ItemCell, height: Int, width: Int) {
+        item.cellHSpan = height / cellHeight
+        item.cellVSpan = width / cellWidth
+    }
 }

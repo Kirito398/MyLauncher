@@ -16,5 +16,4 @@ object RoomConstants {
     const val TAG_DESKTOP_NUMBER = "tag_desktop_number"
     const val TAG_SPAN_X = "tag_span_x"
     const val TAG_SPAN_Y = "tag_span_y"
-    const val TAG_APP_WIDGET_ID = "tag_app_widget_id"
 }

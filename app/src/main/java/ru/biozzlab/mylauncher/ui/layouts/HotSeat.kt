@@ -26,6 +26,7 @@ class HotSeat : FrameLayout {
     private val cellCountX: Int
     private val cellCountY: Int
     private val menuButtonPosition: Int
+    private lateinit var onAllAppsButtonClickedListener: () -> Unit
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -36,6 +37,10 @@ class HotSeat : FrameLayout {
 
     fun getCellLayout(): CellLayout = hotSeatContent
 
+    fun setOnAllAppsButtonClickListener(listener: () -> Unit) {
+        onAllAppsButtonClickedListener = listener
+    }
+
     private fun resetLayout() {
         hotSeatContent.removeAllViewsInLayout()
 
@@ -44,7 +49,10 @@ class HotSeat : FrameLayout {
         allAppsButton.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(context, all_apps_button_icon), null, null)
         allAppsButton.contentDescription = "Apps"
 
-        allAppsButton.setOnClickListener { "OnAllAppsButtonClicked!".easyLog(this) }
+        allAppsButton.setOnClickListener {
+            "OnAllAppsButtonClicked!".easyLog(this)
+            if (::onAllAppsButtonClickedListener.isInitialized) onAllAppsButtonClickedListener()
+        }
 
         val params = CellLayoutParams(menuButtonPosition, 0, 1, 1)
         hotSeatContent.addViewToCell(allAppsButton, -1, 0, params, true)

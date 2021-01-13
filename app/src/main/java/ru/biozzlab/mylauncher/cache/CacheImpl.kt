@@ -43,8 +43,7 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
                     entity.cellY,
                     entity.desktopNumber,
                     entity.spanX,
-                    entity.spanY,
-                    entity.appWidgetId
+                    entity.spanY
                 )
             )
         return Either.Right(list)

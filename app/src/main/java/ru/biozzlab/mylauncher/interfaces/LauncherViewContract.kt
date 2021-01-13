@@ -2,6 +2,7 @@ package ru.biozzlab.mylauncher.interfaces
 
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
+import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemWidget
 
@@ -21,6 +22,6 @@ interface LauncherViewContract {
         fun setView(view: View)
         fun init()
         fun onItemShortcutDataChanged(item: ItemShortcut)
-        fun addShortcutToUpdateQueue(item: ItemShortcut)
+        fun addShortcutToUpdateQueue(item: ItemCell)
     }
 }

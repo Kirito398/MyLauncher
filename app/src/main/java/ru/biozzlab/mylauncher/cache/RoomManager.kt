@@ -1,6 +1,5 @@
 package ru.biozzlab.mylauncher.cache
 
-import android.appwidget.AppWidgetHost
 import android.content.ContentValues
 import android.content.Context
 import android.content.res.TypedArray
@@ -17,7 +16,6 @@ import ru.biozzlab.mylauncher.cache.RoomConstants.DB_VERSION
 import ru.biozzlab.mylauncher.cache.RoomConstants.SHORTCUT
 import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_CELLS
 import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_WIDGETS
-import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_APP_WIDGET_ID
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_X
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_Y
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CLASS_NAME
@@ -116,12 +114,8 @@ abstract class RoomManager : RoomDatabase() {
             val spanX = attrs.getInt(R.styleable.Favorite_spanX, 1)
             val spanY = attrs.getInt(R.styleable.Favorite_spanY, 1)
 
-            val appWidgetHost = AppWidgetHost(context, 1024)
-            val appWidgetId = appWidgetHost.allocateAppWidgetId()
-
             values.put(TAG_SPAN_X, spanX)
             values.put(TAG_SPAN_Y, spanY)
-            values.put(TAG_APP_WIDGET_ID, appWidgetId)
 
             db.insert(TABLE_WIDGETS, SQLiteDatabase.CONFLICT_REPLACE, values)
         }

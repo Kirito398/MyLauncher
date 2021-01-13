@@ -22,9 +22,7 @@ data class WidgetEntity(
     @ColumnInfo(name = RoomConstants.TAG_SPAN_X)
     val spanX: Int,
     @ColumnInfo(name = RoomConstants.TAG_SPAN_Y)
-    val spanY: Int,
-    @ColumnInfo(name = RoomConstants.TAG_APP_WIDGET_ID)
-    val appWidgetId: Int
+    val spanY: Int
 ) {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = RoomConstants.TAG_ID)

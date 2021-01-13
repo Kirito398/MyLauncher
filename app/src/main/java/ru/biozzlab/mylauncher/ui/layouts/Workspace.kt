@@ -235,12 +235,12 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         //TODO("Not yet implemented")
     }
 
-    fun findEmptyArea(position: MutableList<Int>): Int {
+    fun findEmptyArea(position: MutableList<Int>, spanX: Int = 1, spanY: Int = 1): Int {
         var childNumber = -1
 
         for (i in 0 until childCount) {
             val child: CellLayout = (getChildAt(i) as CellLayout)
-            val areaPosition = child.findNearestArea(0, 0)
+            val areaPosition = child.findNearestArea(0, 0, spanX, spanY)
 
             if (areaPosition[0] >= 0 && areaPosition[1] >= 0) {
                 position[0] = areaPosition[0]
