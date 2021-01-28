@@ -9,7 +9,9 @@ import android.widget.TextView
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
+import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
@@ -65,7 +67,14 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         this.dragView = view
 
         //dragOutline = createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
-        dragOutline = (dragView.tag as ItemShortcut).iconBitmap!!
+        //dragOutline = (dragView.tag as ItemShortcut).iconBitmap!!
+
+        val item = dragView.tag
+        dragOutline = when (item) {
+            is ItemShortcut -> item.iconBitmap!!
+            is ItemWidget -> createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
+            else -> createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
+        }
 
         beginDragShared(view)
     }
@@ -81,15 +90,22 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         val dragLayerX = round(location[0] - (width - scale * view.width) / 2).toInt()
         val dragLayerY = round(location[1] - (height - scale * height) / 2 - DRAG_BITMAP_PADDING / 2).toInt()
 
+        val item = dragView.tag as ItemCell
+        val spanX = item.cellHSpan
+        val spanY = item.cellVSpan
+
         dragController.startDrag(
             context,
+            view,
             dragLayer,
             bitmap,
             dragLayerX,
             dragLayerY,
             this,
             DragController.DragAction.MOVE,
-            scale
+            scale,
+            spanX,
+            spanY
         )
         bitmap.recycle()
     }
@@ -132,12 +148,17 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             )
             canvas.translate(padding / 2F, padding / 2F)
             drawable.draw(canvas)
+        } else {
+            canvas.translate(-view.scrollX + padding / 2.0F, -view.scrollY + padding / 2.0F)
+            canvas.clipRect(clipRect, Region.Op.REPLACE)
+            view.draw(canvas)
         }
         canvas.restore()
     }
 
     private fun createDragOutline(view: View, canvas: Canvas, padding: Int): Bitmap {
         //val outlineColor = resources.getColor(android.R.color.white)
+
         val bitmap = Bitmap.createBitmap(
             view.width + padding,
             view.height + padding,
@@ -175,14 +196,14 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragTargetLayout = getCurrentDragTargetLayout(dragObject)
 
         dragObject.dragView?.let {
-            val targetCell = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y)
+            val targetCell = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y, dragObject.spanX, dragObject.spanY)
             dropTargetCell.copy(targetCell)
-            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetCell, it.dragRegion)
+            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetCell, it.dragRegion, it.tag is ItemWidget)
         }
     }
 
     override fun onDragExit(dragObject: DragObject) {
-        //dragTargetLayout.deleteDragOutlineBitmap()
+        dragTargetLayout.deleteDragOutlineBitmap()
     }
 
     override fun acceptDrop(dragObject: DragObject): Boolean = true
@@ -191,6 +212,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragObject.deferDragViewCleanupPostAnimation = false
         dragView.visibility = View.VISIBLE
         dragView.isClickable = true
+        dragView.isPressed = true
 
         if (dropTargetCell[0] < 0 || dropTargetCell[1] < 0) return
 
@@ -200,25 +222,26 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         layoutParams.isDropped = true
         layoutParams.showText = !dragTargetLayout.isHotSeat
 
-        updateShortcut()
+        updateView()
         dragView.requestLayout()
     }
 
-    private fun updateShortcut() {
-        val shortcutItem = dragView.tag as ItemShortcut
+    private fun updateView() {
+        val item = dragView.tag as ItemCell
 
         //if (currentPage != shortcutItem.desktopNumber || dragTargetLayout.isHotSeat)
-            moveShortcut(dragView)
+            moveView(dragView)
 
-        shortcutItem.cellX = dropTargetCell[0]
-        shortcutItem.cellY = dropTargetCell[1]
-        shortcutItem.desktopNumber = currentPage
-        shortcutItem.container = if (dragTargetLayout.isHotSeat) ContainerType.HOT_SEAT else ContainerType.DESKTOP
+        item.cellX = dropTargetCell[0]
+        item.cellY = dropTargetCell[1]
+        item.desktopNumber = currentPage
+        item.container = if (dragTargetLayout.isHotSeat) ContainerType.HOT_SEAT else ContainerType.DESKTOP
 
-        onShortcutDataChangedListener?.invoke(shortcutItem)
+        if (item is ItemShortcut)
+            onShortcutDataChangedListener?.invoke(item)
     }
 
-    private fun moveShortcut(view: View) {
+    private fun moveView(view: View) {
         val fromLayout = view.parent as CellContainer
         val toLayout = dragTargetLayout
 

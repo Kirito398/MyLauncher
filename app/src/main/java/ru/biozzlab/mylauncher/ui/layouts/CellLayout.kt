@@ -33,7 +33,6 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var widthGap: Int = -1
     private var heightGap: Int = -1
 
-
     private var interceptTouchListener: OnTouchListener? = null
     private var dragOutlineBitmap: Bitmap? = null
     private var dragOutlineRect: Rect = Rect(-1, -1, -1, -1)
@@ -98,11 +97,13 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         requestLayout()
     }
 
-    fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect) {
+    fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect, isWidget: Boolean) {
         cellToPoint(position[0], position[1], position)
 
-        val left = position[0] + (cellWidth - dragRegion.width()) / 2
+        var left = position[0] //+ (cellWidth - dragRegion.width()) / 2
         val top = position[1]
+
+        if (!isWidget) left += (cellWidth - dragRegion.width()) / 2
 
         dragOutlineBitmap = bitmap
         dragOutlineRect.set(left, top, left + dragOutlineBitmap!!.width, top + dragOutlineBitmap!!.height)
@@ -128,7 +129,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
         for (row in 0 until rowCount) {
             for (column in 0 until columnCount) {
-                if (column + spanX - 1 > columnCount || row + spanY - 1 > rowCount) continue
+                if (column + spanX > columnCount || row + spanY > rowCount) continue
 
                 var isCellEmpty = true
                 for (i in 0 until spanX)

@@ -8,6 +8,8 @@ import android.view.MotionEvent
 import android.view.View
 import ru.biozzlab.mylauncher.calculateDistance
 import ru.biozzlab.mylauncher.domain.models.DragObject
+import ru.biozzlab.mylauncher.domain.models.ItemCell
+import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.ui.interfaces.DragScroller
 import ru.biozzlab.mylauncher.ui.interfaces.DragSource
 import ru.biozzlab.mylauncher.ui.interfaces.DropTarget
@@ -56,16 +58,18 @@ class DragController {
         onLongPressListener = listener
     }
 
-    fun startDrag(context: Context, dragLayer: DragLayer, bitmap: Bitmap, dragLayerX: Int, dragLayerY: Int,
-                  dragSource: DragSource, dragAction: DragAction, initialDragViewScale: Float) {
+    fun startDrag(context: Context, view: View, dragLayer: DragLayer, bitmap: Bitmap, dragLayerX: Int, dragLayerY: Int,
+                  dragSource: DragSource, dragAction: DragAction, initialDragViewScale: Float, spanX: Int, spanY: Int) {
         val registrationX = motionDownX - dragLayerX
         val registrationY = motionDownY - dragLayerY
 
         isDragging = true
 
-        dragObject = DragObject()
+        dragObject = DragObject(spanX = spanX, spanY = spanY)
         dragObject.dragSource = dragSource
-        dragObject.dragView = DragView(context, dragLayer, bitmap, registrationX, registrationY, 0, 0, bitmap.width, bitmap.height, initialDragViewScale)
+        dragObject.dragView =
+            DragView(context, dragLayer, bitmap, registrationX, registrationY, 0, 0, bitmap.width, bitmap.height, initialDragViewScale)
+                .apply { tag = view.tag }
 
         dragObject.dragView?.show(motionDownX, motionDownY)
     }
@@ -131,7 +135,9 @@ class DragController {
         val deltaTime = System.currentTimeMillis() - motionDownTime
         if (deltaTime < LONG_PRESS_TIME) return
 
-        onLongPressListener?.invoke()
+        if ((dragObject.dragView?.tag as ItemCell).type == WorkspaceItemType.SHORTCUT)
+            onLongPressListener?.invoke()
+
         motionDownTime = -1
     }
 

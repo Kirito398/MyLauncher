@@ -1,7 +1,6 @@
 package ru.biozzlab.mylauncher.ui
 
 import android.app.Activity
-import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
@@ -29,6 +28,7 @@ import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.HotSeat
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
+import ru.biozzlab.mylauncher.ui.widgets.LauncherAppWidgetHost
 import javax.inject.Inject
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
@@ -37,7 +37,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     private lateinit var workspace: Workspace
     private lateinit var dragController: DragController
-    private lateinit var appWidgetHost: AppWidgetHost
+    private lateinit var appWidgetHost: LauncherAppWidgetHost
     private lateinit var appWidgetManager: AppWidgetManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +66,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         workspace.setHotSeat(hotSeat as HotSeat)
         dragLayer.setup(dragController)
 
-        appWidgetHost = AppWidgetHost(applicationContext, 1024)
+        appWidgetHost = LauncherAppWidgetHost(applicationContext, 1024)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
     }
 
@@ -228,16 +228,12 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         val item = widget
             ?: ItemCell(
-                -1,
-                WorkspaceItemType.WIDGET,
-                ContainerType.DESKTOP,
-                appWidgetInfo.provider.packageName,
-                appWidgetInfo.provider.className,
-                -1,
-                -1,
-                -1,
-                -1,
-                -1
+                type = WorkspaceItemType.WIDGET,
+                container = ContainerType.DESKTOP,
+                packageName = appWidgetInfo.provider.packageName,
+                className = appWidgetInfo.provider.className,
+                cellHSpan = -1,
+                cellVSpan = -1
             )
 
         if (item.cellHSpan < 0 || item.cellVSpan < 0)
@@ -252,6 +248,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
         widgetView.layoutParams = params
         widgetView.tag = item
+
+        widgetView.setOnLongClickListener {
+            workspace.startDrag(it)
+            return@setOnLongClickListener false
+        }
 
         layout.addViewToCell(widgetView, -1, 30, params, false)
     }

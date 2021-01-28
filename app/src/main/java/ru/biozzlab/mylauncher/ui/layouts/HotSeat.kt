@@ -21,6 +21,8 @@ class HotSeat : FrameLayout {
         cellCountX = attrs.getInt(R.styleable.HotSeat_cellCountX, -1)
         cellCountY = attrs.getInt(R.styleable.HotSeat_cellCountY, -1)
         menuButtonPosition = attrs.getInt(R.styleable.HotSeat_menuButtonPosition, 2)
+
+        attrs.recycle()
     }
 
     private val cellCountX: Int
