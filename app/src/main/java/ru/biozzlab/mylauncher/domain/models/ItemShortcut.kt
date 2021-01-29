@@ -5,9 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.LauncherApps
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.PaintDrawable
@@ -68,10 +66,17 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
     }
 
     private fun createIconBitmap(icon: Drawable): Bitmap {
-        var width: Int = App.appContext.resources.getDimension(R.dimen.app_icon_size).toInt()
+        val resources = App.appContext.resources
+
+        val paint = Paint()
+        paint.color = resources.getColor(R.color.app_icon_background_color)
+
+        val iconBorderRadius = resources.getDimension(R.dimen.app_icon_border_radius)
+        val iconPadding = resources.getDimension(R.dimen.app_icon_padding).toInt()
+        var width: Int = resources.getDimension(R.dimen.app_icon_size).toInt()
         var height: Int = width
-        val textureWidth = width
-        val textureHeight = width
+        val textureWidth = width + iconPadding
+        val textureHeight = width + iconPadding
 
         when(icon) {
             is PaintDrawable -> {
@@ -108,6 +113,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         val bitmap = Bitmap.createBitmap(textureWidth, textureHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas()
         canvas.setBitmap(bitmap)
+        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
 
         val left = (textureWidth - width) / 2
         val top = (textureHeight - height) / 2
