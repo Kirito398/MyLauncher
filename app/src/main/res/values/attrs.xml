@@ -15,6 +15,7 @@
         <attr name="cellCountX"/>
         <attr name="cellCountY"/>
         <attr name="menuButtonPosition" format="integer"/>
+        <attr name="showMenuButton" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="Workspace">

@@ -22,6 +22,7 @@ class HotSeat : FrameLayout {
         cellCountX = attrs.getInt(R.styleable.HotSeat_cellCountX, -1)
         cellCountY = attrs.getInt(R.styleable.HotSeat_cellCountY, -1)
         menuButtonPosition = attrs.getInt(R.styleable.HotSeat_menuButtonPosition, 2)
+        menuButtonIsVisible = attrs.getBoolean(R.styleable.HotSeat_showMenuButton, true)
 
         attrs.recycle()
     }
@@ -29,6 +30,7 @@ class HotSeat : FrameLayout {
     private val cellCountX: Int
     private val cellCountY: Int
     private val menuButtonPosition: Int
+    private val menuButtonIsVisible: Boolean
     private lateinit var onAllAppsButtonClickedListener: () -> Unit
 
     override fun onFinishInflate() {
@@ -46,6 +48,8 @@ class HotSeat : FrameLayout {
 
     private fun resetLayout() {
         hotSeatContent.removeAllViewsInLayout()
+
+        if (!menuButtonIsVisible) return
 
         val inflater = LayoutInflater.from(context)
         val allAppsButton = inflater.inflate(R.layout.item_application, hotSeatContent, false) as TextView

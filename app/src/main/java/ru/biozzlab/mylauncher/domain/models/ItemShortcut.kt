@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.PaintDrawable
 import android.os.UserHandle
 import android.os.UserManager
+import androidx.core.content.ContextCompat
 import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.ui.views.IconDrawable
@@ -61,7 +62,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         val iconDensity = (App.appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).launcherLargeIconDensity
 
         launcherActivityInfo?.run {
-            icon = IconDrawable(createIconBitmap(getBadgedIcon(iconDensity)))
+            icon = IconDrawable(createIconBitmap(getIcon(iconDensity)))
         }
     }
 
@@ -69,7 +70,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         val resources = App.appContext.resources
 
         val paint = Paint()
-        paint.color = resources.getColor(R.color.app_icon_background_color)
+        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_color)
 
         val iconBorderRadius = resources.getDimension(R.dimen.app_icon_border_radius)
         val iconPadding = resources.getDimension(R.dimen.app_icon_padding).toInt()

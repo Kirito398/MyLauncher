@@ -6,6 +6,9 @@
 
     <dimen name="workspace_cell_width_land">106dp</dimen>
 
+    <integer name="cell_layout_column_count">4</integer>
+    <integer name="cell_layout_row_count">5</integer>
+
     <dimen name="cell_layout_padding_top">15dp</dimen>
     <dimen name="cell_layout_padding_start">20dp</dimen>
     <dimen name="cell_layout_padding_end">20dp</dimen>
@@ -15,8 +18,17 @@
     <dimen name="cell_layout_height_gap">0dp</dimen>
     <dimen name="cell_layout_max_gap">16dp</dimen>
 
-    <integer name="cell_layout_column_count">4</integer>
-    <integer name="cell_layout_row_count">5</integer>
     <integer name="hot_seat_column_count">5</integer>
     <integer name="hot_seat_row_count">1</integer>
+
+    <dimen name="hot_seat_padding_top">8dp</dimen>
+    <dimen name="hot_seat_padding_bottom">0dp</dimen>
+    <dimen name="hot_seat_padding_start">0dp</dimen>
+    <dimen name="hot_seat_padding_end">0dp</dimen>
+    <dimen name="hot_seat_cell_width">64dp</dimen>
+    <dimen name="hot_seat_cell_height">64dp</dimen>
+    <dimen name="hot_seat_width_gap">-1dp</dimen>
+    <dimen name="hot_seat_height_gap">-1dp</dimen>
+    <dimen name="hot_seat_max_gap">16dp</dimen>
+    <bool name="hot_seat_menu_button_visible">true</bool>
 </resources>
