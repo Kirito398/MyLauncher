@@ -1,6 +1,7 @@
 package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -56,7 +57,13 @@ class HotSeat : FrameLayout {
             if (::onAllAppsButtonClickedListener.isInitialized) onAllAppsButtonClickedListener()
         }
 
-        val params = CellLayoutParams(menuButtonPosition, 0, 1, 1)
+        var cellX = 0
+        var cellY = 0
+
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) cellY = menuButtonPosition
+        else cellX = menuButtonPosition
+
+        val params = CellLayoutParams(cellX, cellY, 1, 1)
         hotSeatContent.addViewToCell(allAppsButton, -1, 0, params, true)
     }
 }

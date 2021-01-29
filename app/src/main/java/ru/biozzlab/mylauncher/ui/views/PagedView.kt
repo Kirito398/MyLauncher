@@ -300,9 +300,9 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        if (widthMode != MeasureSpec.EXACTLY)
-            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
+//        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+//        if (widthMode != MeasureSpec.EXACTLY)
+//            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
 
 //        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 //        if (heightMode != MeasureSpec.EXACTLY)

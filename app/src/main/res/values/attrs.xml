@@ -7,6 +7,8 @@
         <attr name="widthGap" format="dimension"/>
         <attr name="heightGap" format="dimension"/>
         <attr name="maxGap" format="dimension"/>
+        <attr name="columnCount" format="dimension"/>
+        <attr name="rowCount" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="HotSeat">

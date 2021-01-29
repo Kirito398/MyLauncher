@@ -2,4 +2,18 @@
 <resources>
     <dimen name="app_icon_size">48dp</dimen>
     <dimen name="workspace_cell_width_land">106dp</dimen>
+
+    <dimen name="cell_layout_padding_top">15dp</dimen>
+    <dimen name="cell_layout_padding_start">20dp</dimen>
+    <dimen name="cell_layout_padding_end">20dp</dimen>
+    <dimen name="cell_layout_cell_width">80dp</dimen>
+    <dimen name="cell_layout_cell_height">100dp</dimen>
+    <dimen name="cell_layout_width_gap">0dp</dimen>
+    <dimen name="cell_layout_height_gap">0dp</dimen>
+    <dimen name="cell_layout_max_gap">16dp</dimen>
+
+    <integer name="cell_layout_column_count">4</integer>
+    <integer name="cell_layout_row_count">5</integer>
+    <integer name="hot_seat_column_count">5</integer>
+    <integer name="hot_seat_row_count">1</integer>
 </resources>

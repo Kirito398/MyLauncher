@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="cell_layout_column_count">5</integer>
+    <integer name="cell_layout_row_count">3</integer>
+    <integer name="hot_seat_column_count">1</integer>
+    <integer name="hot_seat_row_count">5</integer>
+
+    <dimen name="cell_layout_padding_top">60dp</dimen>
+    <dimen name="cell_layout_padding_start">50dp</dimen>
+    <dimen name="cell_layout_padding_end">50dp</dimen>
+    <dimen name="cell_layout_cell_width">120dp</dimen>
+    <dimen name="cell_layout_cell_height">140dp</dimen>
+    <dimen name="cell_layout_width_gap">50dp</dimen>
+    <dimen name="cell_layout_height_gap">30dp</dimen>
+    <dimen name="cell_layout_max_gap">16dp</dimen>
+</resources>

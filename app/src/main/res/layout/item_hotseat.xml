@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cellCountX="5"
-    app:cellCountY="1"
+    app:cellCountX="@integer/hot_seat_column_count"
+    app:cellCountY="@integer/hot_seat_row_count"
     app:menuButtonPosition="2">
 
     <ru.biozzlab.mylauncher.ui.layouts.CellLayout

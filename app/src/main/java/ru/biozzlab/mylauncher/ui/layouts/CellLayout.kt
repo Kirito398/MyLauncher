@@ -50,10 +50,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         cellHeight = attrs.getDimensionPixelSize(R.styleable.CellLayout_cellHeight, 10)
         widthGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_widthGap, 0)
         heightGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_heightGap, 0)
+        columnCount = attrs.getInt(R.styleable.CellLayout_columnCount, DEFAULT_COLUMN_COUNT)
+        rowCount = attrs.getInt(R.styleable.CellLayout_rowCount, DEFAULT_ROW_COUNT)
         attrs.recycle()
-
-        columnCount = DEFAULT_COLUMN_COUNT
-        rowCount = DEFAULT_ROW_COUNT
 
         dragOutlinePaint = Paint()
         dragOutlinePaint.alpha = DRAG_OUTLINE_PAINT_ALPHA

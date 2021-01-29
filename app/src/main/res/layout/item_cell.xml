@@ -4,13 +4,15 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:hapticFeedbackEnabled="false"
-    android:paddingTop="15dp"
-    android:paddingStart="20dp"
-    android:paddingEnd="20dp"
-    app:cellWidth="80dp"
-    app:cellHeight="100dp"
-    app:widthGap="0dp"
-    app:heightGap="0dp"
-    app:maxGap="16dp">
+    android:paddingTop="@dimen/cell_layout_padding_top"
+    android:paddingStart="@dimen/cell_layout_padding_start"
+    android:paddingEnd="@dimen/cell_layout_padding_end"
+    app:cellWidth="@dimen/cell_layout_cell_width"
+    app:cellHeight="@dimen/cell_layout_cell_height"
+    app:widthGap="@dimen/cell_layout_width_gap"
+    app:heightGap="@dimen/cell_layout_height_gap"
+    app:maxGap="@dimen/cell_layout_max_gap"
+    app:columnCount="@integer/cell_layout_column_count"
+    app:rowCount="@integer/cell_layout_row_count">
 
 </ru.biozzlab.mylauncher.ui.layouts.CellLayout>
