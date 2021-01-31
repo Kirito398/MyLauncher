@@ -41,7 +41,7 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private val testCellPosition = Point(-1, -1)
     private val testDragViewPosition = Point(-1, -1)
     private val testPaint = Paint()
-    private val isDebug = true
+    private val isDebug = false
 
     private val container: CellContainer = CellContainer(context)
 

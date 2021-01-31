@@ -64,6 +64,7 @@ class DragController {
         val registrationY = motionDownY - dragLayerY
 
         isDragging = true
+        if (::dragObject.isInitialized) dragObject.dragView?.remove()
 
         dragObject = DragObject(spanX = spanX, spanY = spanY)
         dragObject.dragSource = dragSource
@@ -78,7 +79,7 @@ class DragController {
         if (!isDragging) return
         isDragging = false
 
-        dragObject.dragView?.let { if (!dragObject.deferDragViewCleanupPostAnimation) it.remove() }
+        dragObject.dragView?.let { /*if (!dragObject.deferDragViewCleanupPostAnimation)*/ it.remove() }
         dragObject.dragView = null
     }
 
