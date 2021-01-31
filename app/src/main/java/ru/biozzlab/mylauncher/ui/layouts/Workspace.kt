@@ -150,7 +150,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             drawable.draw(canvas)
         } else {
             canvas.translate(-view.scrollX + padding / 2.0F, -view.scrollY + padding / 2.0F)
-            canvas.clipRect(clipRect, Region.Op.REPLACE)
+            //canvas.clipRect(clipRect, Region.Op.REPLACE)
             view.draw(canvas)
         }
         canvas.restore()

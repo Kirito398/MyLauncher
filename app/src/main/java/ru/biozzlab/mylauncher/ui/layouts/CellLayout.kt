@@ -38,6 +38,11 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var dragOutlineRect: Rect = Rect(-1, -1, -1, -1)
     private var dragOutlinePaint: Paint
 
+    private val testCellPosition = Point(-1, -1)
+    private val testDragViewPosition = Point(-1, -1)
+    private val testPaint = Paint()
+    private val isDebug = true
+
     private val container: CellContainer = CellContainer(context)
 
     var isHotSeat = false
@@ -141,11 +146,18 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
                 cellToPoint(column, row, cellPosition)
 
                 val centerX = x - cellWidth / 2
-                val centerY = y - cellHeight / 2
+                val centerY = y + cellHeight / 2
+                val cellCenterX = cellPosition[0] + cellWidth / 2
+                val cellCenterY = cellPosition[1] + cellHeight / 2
 
-                val distance = calculateDistance(Point(cellPosition[0], cellPosition[1]), Point(centerX, centerY))
+                val distance = calculateDistance(Point(cellCenterX, cellCenterY), Point(centerX, centerY))
 
                 if (distance >= minDistance) continue
+
+                testCellPosition.x = cellCenterX
+                testCellPosition.y = cellCenterY
+                testDragViewPosition.x = centerX
+                testDragViewPosition.y = centerY
 
                 minDistance = distance
                 point[0] = column
@@ -174,6 +186,57 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     override fun onDraw(canvas: Canvas?) {
         dragOutlineBitmap?.let {
             canvas?.drawBitmap(it, null, dragOutlineRect, dragOutlinePaint)
+        }
+
+        if (isDebug) {
+            testPaint.style = Paint.Style.FILL_AND_STROKE
+            drawCellsPositions(canvas, testPaint)
+            drawTestDistanceLine(canvas, testPaint)
+            drawCellsBoundsRect(canvas, testPaint)
+        }
+    }
+
+    private fun drawTestDistanceLine(canvas: Canvas?, paint: Paint) {
+        paint.color = Color.parseColor("#FF0000")
+        canvas?.drawLine(testCellPosition.x.toFloat(), testCellPosition.y.toFloat(), testDragViewPosition.x.toFloat(), testDragViewPosition.y.toFloat(), paint)
+
+        paint.color = Color.parseColor("#00FF00")
+        canvas?.drawCircle(testCellPosition.x.toFloat(), testCellPosition.y.toFloat(), 10F, paint)
+
+        paint.color = Color.parseColor("#0000FF")
+        canvas?.drawCircle(testDragViewPosition.x.toFloat(), testDragViewPosition.y.toFloat(), 10F, paint)
+    }
+
+    private fun drawCellsBoundsRect(canvas: Canvas?, paint: Paint) {
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.parseColor("#FF0000")
+
+        for (child in container.children) {
+            if (child.visibility != View.VISIBLE) continue
+            val clipBounds = Rect()
+            child.getDrawingRect(clipBounds)
+
+            val x = child.x.toInt() + paddingStart
+            val y = child.y.toInt() + paddingTop
+
+            clipBounds.left = x
+            clipBounds.top = y
+            clipBounds.bottom = y + child.height
+            clipBounds.right = x + child.width
+            canvas?.drawRect(clipBounds, paint)
+        }
+    }
+
+    private fun drawCellsPositions(canvas: Canvas?, paint: Paint) {
+        val positions = getCellsPosition()
+        paint.color = Color.parseColor("#FF0000")
+
+        for (position in positions) {
+            val cellPoint = mutableListOf(-1, -1)
+            cellToPoint(position.first, position.second, cellPoint)
+            val cellCenterX = cellPoint[0] + cellWidth / 2
+            val cellCenterY = cellPoint[1] + cellHeight / 2
+            canvas?.drawCircle(cellCenterX.toFloat(), cellCenterY.toFloat(), 10F, paint)
         }
     }
 

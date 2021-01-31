@@ -28,5 +28,5 @@
     <dimen name="hot_seat_width_gap">0dp</dimen>
     <dimen name="hot_seat_height_gap">40dp</dimen>
     <dimen name="hot_seat_max_gap">16dp</dimen>
-    <bool name="hot_seat_menu_button_visible">false</bool>
+    <bool name="hot_seat_menu_button_visible">true</bool>
 </resources>

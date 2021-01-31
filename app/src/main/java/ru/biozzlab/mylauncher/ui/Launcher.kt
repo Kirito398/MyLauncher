@@ -239,6 +239,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (item.cellHSpan < 0 || item.cellVSpan < 0)
             (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
 
+        item.cellHSpan = 2
+        item.cellVSpan = 2
+
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
             findAreaInCellLayout(item)
 

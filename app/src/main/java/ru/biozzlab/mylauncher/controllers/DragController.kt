@@ -120,8 +120,8 @@ class DragController {
 
     private fun handleMove(x: Int, y: Int) {
         dragObject.dragView?.move(x, y)
-        dragObject.x = x
-        dragObject.y = y
+        dragObject.x = dragObject.dragView?.translationX?.toInt() ?: x
+        dragObject.y = dragObject.dragView?.translationY?.toInt() ?: y
         dropTarget.onDragOver(dragObject)
 
         checkLongPress(x, y)
