@@ -150,6 +150,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             drawable.draw(canvas)
         } else {
             canvas.translate(-view.scrollX + padding / 2.0F, -view.scrollY + padding / 2.0F)
+            canvas.clipRect(clipRect)
             //canvas.clipRect(clipRect, Region.Op.REPLACE)
             view.draw(canvas)
         }
@@ -237,8 +238,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         item.desktopNumber = currentPage
         item.container = if (dragTargetLayout.isHotSeat) ContainerType.HOT_SEAT else ContainerType.DESKTOP
 
-        if (item is ItemShortcut)
+        if (item is ItemShortcut) {
             onShortcutDataChangedListener?.invoke(item)
+            (dragView as TextView).setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
+        }
     }
 
     private fun moveView(view: View) {

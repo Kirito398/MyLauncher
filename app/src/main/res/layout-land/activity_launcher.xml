@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.Launcher"
     android:id="@+id/clLayout"
-    android:background="@color/main_background_color">
+    android:background="@drawable/main_background">
 
     <ru.biozzlab.mylauncher.ui.layouts.DragLayer
         android:id="@+id/dragLayer"
@@ -60,7 +60,7 @@
             app:layout_constraintBottom_toBottomOf="@id/workspaceView"
             app:layout_constraintStart_toStartOf="@id/workspaceView"
             app:layout_constraintEnd_toEndOf="@id/workspaceView"
-            android:visibility="gone"/>
+            android:visibility="invisible"/>
 
         <ImageView
             android:id="@+id/ivPageIndicator"

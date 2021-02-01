@@ -14,6 +14,7 @@ import android.os.UserManager
 import androidx.core.content.ContextCompat
 import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
+import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.views.IconDrawable
 
 class ItemShortcut(cell: ItemCell) : ItemCell(
@@ -29,7 +30,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
     cell.cellVSpan
 ) {
     lateinit var intent: Intent
-    var icon: IconDrawable? = null
+    val icon: IconDrawable? get() = initIcon()
     var iconBitmap: Bitmap? = null
     var title: String = ""
 
@@ -47,7 +48,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
     }
 
-    private fun initIcon() {
+    private fun initIcon(): IconDrawable? {
         val userManager = App.appContext.getSystemService(Context.USER_SERVICE) as UserManager
         val users = userManager.userProfiles
 
@@ -61,9 +62,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         val launcherActivityInfo = launcherApps.resolveActivity(intent, currentUser)
         val iconDensity = (App.appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).launcherLargeIconDensity
 
-        launcherActivityInfo?.run {
-            icon = IconDrawable(createIconBitmap(getIcon(iconDensity)))
-        }
+        return launcherActivityInfo?.run { IconDrawable(createIconBitmap(getIcon(iconDensity))) }
     }
 
     private fun createIconBitmap(icon: Drawable): Bitmap {
@@ -111,10 +110,20 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
             }
         }
 
+        val matrix = ColorMatrix()
+        matrix.setSaturation(0F)
+
+        val filter = ColorMatrixColorFilter(matrix)
+        paint.colorFilter = filter
+
         val bitmap = Bitmap.createBitmap(textureWidth, textureHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas()
-        canvas.setBitmap(bitmap)
-        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+        val canvas = Canvas(bitmap)
+
+        if (container != ContainerType.HOT_SEAT) {
+            canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+        } else {
+            icon.colorFilter = filter
+        }
 
         val left = (textureWidth - width) / 2
         val top = (textureHeight - height) / 2
