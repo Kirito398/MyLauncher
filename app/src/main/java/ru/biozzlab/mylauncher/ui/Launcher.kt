@@ -40,6 +40,8 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var appWidgetHost: LauncherAppWidgetHost
     private lateinit var appWidgetManager: AppWidgetManager
 
+    private var addingWidgetQueue = mutableMapOf<Int, ItemWidget>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -165,6 +167,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun addWidget(widget: ItemWidget) {
         val appWidgetId = appWidgetHost.allocateAppWidgetId()
+        addingWidgetQueue.put(appWidgetId, widget)
 
         var widgetInfo: AppWidgetProviderInfo? = null
         for (widgetProvider in appWidgetManager.installedProviders) {
@@ -181,7 +184,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetProvider)
-                putExtra(EXTRA_APPWIDGET_MODEL, widget)
+                //putExtra(EXTRA_APPWIDGET_MODEL, widget)
             }
 
             startActivityForResult(intent, REQUEST_BIND_APPWIDGET)
@@ -202,8 +205,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_BIND_APPWIDGET) {
                 data?.extras?.let {
-                    val widget = it.getParcelable<ItemWidget>(EXTRA_APPWIDGET_MODEL) ?: return@let
+                    //val widget = it.getParcelable<ItemWidget>(EXTRA_APPWIDGET_MODEL) ?: return@let
                     val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+                    val widget = addingWidgetQueue[appWidgetId] ?: return@let
+                    addingWidgetQueue.remove(appWidgetId)
 
                     createWidget(appWidgetId, widget)
                 }
@@ -238,9 +243,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         if (item.cellHSpan < 0 || item.cellVSpan < 0)
             (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
-
-        item.cellHSpan = 2
-        item.cellVSpan = 1
+            //(workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, maxHeight, maxWidth)
 
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
             findAreaInCellLayout(item)

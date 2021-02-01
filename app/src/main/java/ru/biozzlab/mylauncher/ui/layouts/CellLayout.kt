@@ -14,6 +14,7 @@ import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.calculateDistance
 import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
+import kotlin.math.max
 
 class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     : ViewGroup(context, attributeSet, defStyle) {
@@ -291,7 +292,16 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     override fun checkLayoutParams(p: ViewGroup.LayoutParams?): Boolean = p is CellLayoutParams
 
     fun calculateItemDimensions(item: ItemCell, height: Int, width: Int) {
-        item.cellHSpan = height / cellHeight
-        item.cellVSpan = width / cellWidth
+        item.cellHSpan = getCellCount(width)
+        item.cellVSpan = getCellCount(height)
+    }
+
+    private fun getCellCount(size: Int): Int {
+        val max = max(columnCount, rowCount)
+        for (i in 1 .. max) {
+            val cellHeight = cellHeight * i
+            if (cellHeight > size) return i
+        }
+        return max
     }
 }

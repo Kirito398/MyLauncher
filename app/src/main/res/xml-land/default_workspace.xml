@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<favorites xmlns:launcher="http://schemas.android.com/apk/res-auto">
+    <appwidget
+        launcher:id="0"
+        launcher:packageName="ru.biozzlab.clocktestwidget"
+        launcher:className="ru.biozzlab.clocktestwidget.ClockWidget"
+        launcher:container="1"
+        launcher:desktopNumber="0"
+        launcher:x="3"
+        launcher:y="0"
+        launcher:spanX="2"
+        launcher:spanY="1" />
+
+    <appwidget
+        launcher:id="1"
+        launcher:packageName="ru.biozzlab.playertestwidget"
+        launcher:className="ru.biozzlab.playertestwidget.NewAppWidget"
+        launcher:container="1"
+        launcher:desktopNumber="0"
+        launcher:x="3"
+        launcher:y="1"
+        launcher:spanX="2"
+        launcher:spanY="2" />
+</favorites>
