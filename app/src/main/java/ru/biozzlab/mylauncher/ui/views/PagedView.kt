@@ -50,6 +50,12 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledTouchSlop
+
+        hierarchyChangeListener()
+    }
+
+    private fun hierarchyChangeListener() {
+        setOnHierarchyChangeListener(this)
     }
 
     private fun initScrollIndicator() {
@@ -149,7 +155,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
     private fun snapToDestination(event: MotionEvent): Boolean {
         when (touchState) {
-            TouchStates.REST -> TODO()
+            TouchStates.REST -> { }//TODO()
             TouchStates.SCROLLING -> {
                 val pointerIndex = event.findPointerIndex(activePointerId)
                 val x = event.getX(pointerIndex)

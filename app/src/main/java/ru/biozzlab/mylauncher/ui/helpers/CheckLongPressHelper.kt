@@ -27,6 +27,7 @@ class CheckLongPressHelper(private val view: View) {
     }
 
     fun cancelLongPress() {
+        hasPerformedLongPress = false
         parentJob.apply {
             cancelChildren()
             cancel()
