@@ -16,17 +16,12 @@ class LauncherAppWidgetHostView(context: Context?) : AppWidgetHostView(context) 
             return true
         }
 
-        return when (ev?.action) {
-            MotionEvent.ACTION_DOWN -> {
-                longPressHelper.checkForLongPress()
-                true
-            }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                longPressHelper.cancelLongPress()
-                false
-            }
-            else -> false
+        when (ev?.action) {
+            MotionEvent.ACTION_DOWN -> { longPressHelper.checkForLongPress() }
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { longPressHelper.cancelLongPress() }
         }
+
+        return false
     }
 
     @SuppressLint("ClickableViewAccessibility")

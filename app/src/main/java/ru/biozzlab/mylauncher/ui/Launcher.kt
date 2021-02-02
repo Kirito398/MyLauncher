@@ -248,7 +248,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
             findAreaInCellLayout(item)
 
-        val layout = workspace.getChildAt(item.desktopNumber) as CellLayout
+        val layout = workspace.getChildAt(item.desktopNumber) as? CellLayout ?: return
         val widgetView = appWidgetHost.createView(applicationContext, appWidgetId, appWidgetInfo)
         widgetView.setAppWidget(appWidgetId, appWidgetInfo)
         val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
