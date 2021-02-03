@@ -63,7 +63,9 @@ class LauncherPresenter(
     }
 
     private fun onInitWorkspaceFinished() {
-        saveShortcuts(SaveShortcuts.Params(shortcutsTempList))
+        saveShortcuts(SaveShortcuts.Params(shortcutsTempList)) {
+            if (it.isRight) shortcutsTempList.clear()
+        }
     }
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {

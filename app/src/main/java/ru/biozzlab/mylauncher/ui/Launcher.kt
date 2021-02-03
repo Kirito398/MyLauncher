@@ -167,7 +167,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun addWidget(widget: ItemWidget) {
         val appWidgetId = appWidgetHost.allocateAppWidgetId()
-        addingWidgetQueue.put(appWidgetId, widget)
 
         var widgetInfo: AppWidgetProviderInfo? = null
         for (widgetProvider in appWidgetManager.installedProviders) {
@@ -187,7 +186,20 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
                 //putExtra(EXTRA_APPWIDGET_MODEL, widget)
             }
 
+            addWidgetToQueue(appWidgetId, widget)
             startActivityForResult(intent, REQUEST_BIND_APPWIDGET)
+        }
+    }
+
+    private fun addWidgetToQueue(appWidgetId: Int, widget: ItemWidget) {
+        addingWidgetQueue[appWidgetId] = widget
+        (workspace.getChildAt(widget.desktopNumber) as CellLayout).setCellsReserved(widget.cellX, widget.cellY, widget.cellHSpan, widget.cellVSpan)
+    }
+
+    private fun removeWidgetFromQueue(appWidgetId: Int) {
+        addingWidgetQueue[appWidgetId]?.run {
+            (workspace.getChildAt(desktopNumber) as CellLayout).removeCellsReserve(cellX, cellY, cellHSpan, cellVSpan)
+            addingWidgetQueue.remove(appWidgetId)
         }
     }
 
@@ -208,8 +220,8 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
                     //val widget = it.getParcelable<ItemWidget>(EXTRA_APPWIDGET_MODEL) ?: return@let
                     val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
                     val widget = addingWidgetQueue[appWidgetId] ?: return@let
-                    addingWidgetQueue.remove(appWidgetId)
 
+                    removeWidgetFromQueue(appWidgetId)
                     createWidget(appWidgetId, widget)
                 }
             }

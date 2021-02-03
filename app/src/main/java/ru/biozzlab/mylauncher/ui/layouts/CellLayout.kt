@@ -39,6 +39,8 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var dragOutlineRect: Rect = Rect(-1, -1, -1, -1)
     private var dragOutlinePaint: Paint
 
+    private var reservedCells = mutableListOf<Pair<Int, Int>>()
+
     private val testCellPosition = Point(-1, -1)
     private val testDragViewPosition = Point(-1, -1)
     private val testPaint = Paint()
@@ -116,6 +118,19 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         invalidate() //TODO проверить как это сделано в исходниках
     }
 
+    fun setCellsReserved(cellX: Int, cellY: Int, cellHSpan: Int = 1, cellVSpan: Int = 1) {
+        for (i in 0 until cellHSpan)
+            for (j in 0 until cellVSpan)
+                reservedCells.add(Pair(cellX + i, cellY + j))
+    }
+
+    fun removeCellsReserve(cellX: Int, cellY: Int, cellHSpan: Int = 1, cellVSpan: Int = 1) {
+        for (i in 0 until cellHSpan)
+            for (j in 0 until cellVSpan)
+                if (reservedCells.contains(Pair(cellX + i, cellY + j)))
+                    reservedCells.remove(Pair(cellX + i, cellY + j))
+    }
+
     fun deleteDragOutlineBitmap() {
         dragOutlineBitmap = null
         dragOutlineRect.set(0, 0, 0, 0)
@@ -171,6 +186,8 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
     private fun getCellsPosition(): MutableList<Pair<Int, Int>> {
         val positions = mutableListOf<Pair<Int, Int>>()
+
+        positions.addAll(reservedCells)
 
         for (child in container.children) {
             if (child.visibility != View.VISIBLE) continue
