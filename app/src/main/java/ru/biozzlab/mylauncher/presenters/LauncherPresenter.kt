@@ -117,7 +117,7 @@ class LauncherPresenter(
         )
     }
 
-    override fun onItemShortcutDataChanged(item: ItemShortcut) {
+    override fun onItemShortcutDataChanged(item: ItemCell) {
         updateShortcut(UpdateShortcut.Params(item))
     }
 

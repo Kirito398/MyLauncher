@@ -21,6 +21,11 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
         return Either.Right(None())
     }
 
+    override fun updateWidget(widget: ItemCell): Either<None, None> {
+        roomManager.widgetDao().update(convertModelToWidgetEntities(widget))
+        return Either.Right(None())
+    }
+
     override fun getIsWorkspaceInit(): Either<None, Boolean> = prefsManager.getIsWorkspaceInit()
 
     override fun saveShortcuts(shortcuts: MutableList<ItemCell>): Either<None, MutableList<ItemCell>> {
@@ -75,6 +80,23 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
             model.cellX,
             model.cellY,
             model.desktopNumber
+        )
+
+        if (model.id >= 0) entity.id = model.id
+
+        return entity
+    }
+
+    private fun convertModelToWidgetEntities(model: ItemCell): WidgetEntity {
+        val entity = WidgetEntity(
+            model.packageName,
+            model.className,
+            model.container.id,
+            model.cellX,
+            model.cellY,
+            model.desktopNumber,
+            model.cellHSpan,
+            model.cellVSpan
         )
 
         if (model.id >= 0) entity.id = model.id
