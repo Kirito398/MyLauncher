@@ -5,10 +5,9 @@ import ru.bis.entities.Either
 import ru.bis.entities.None
 
 interface Cache {
-    fun loadShortcuts(): Either<None, MutableList<ItemCell>>
-    fun loadWidgets(): Either<None, MutableList<ItemCell>>
-    fun updateShortcut(shortcut: ItemCell): Either<None, None>
-    fun updateWidget(widget: ItemCell): Either<None, None>
+    fun insertCell(itemCell: ItemCell): Either<None, ItemCell>
+    fun loadCells(): Either<None, MutableList<ItemCell>>
+    fun updateCell(itemCell: ItemCell): Either<None, None>
     fun getIsWorkspaceInit(): Either<None, Boolean>
-    fun saveShortcuts(shortcuts: MutableList<ItemCell>): Either<None, MutableList<ItemCell>>
+    fun saveCells(cells: MutableList<ItemCell>): Either<None, MutableList<ItemCell>>
 }

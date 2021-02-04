@@ -21,7 +21,8 @@ interface LauncherViewContract {
     interface Presenter : LifecycleObserver {
         fun setView(view: View)
         fun init()
-        fun onItemShortcutDataChanged(item: ItemCell)
+        fun onItemCellDataChanged(item: ItemCell)
         fun addShortcutToUpdateQueue(item: ItemCell)
+        fun saveWidget(item: ItemCell)
     }
 }

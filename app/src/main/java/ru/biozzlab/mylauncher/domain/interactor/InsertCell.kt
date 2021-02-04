@@ -6,8 +6,9 @@ import ru.bis.entities.AsyncUseCase
 import ru.bis.entities.Either
 import ru.bis.entities.None
 
-class UpdateCell(private val repository: Repository) : AsyncUseCase<None, UpdateCell.Params, None>() {
-    override suspend fun run(params: Params): Either<None, None> = repository.updateCell(params.itemCell)
+class InsertCell(private val repository: Repository) : AsyncUseCase<ItemCell, InsertCell.Params, None>() {
+
+    override suspend fun run(params: Params): Either<None, ItemCell> = repository.insertCell(params.itemCell)
 
     data class Params(val itemCell: ItemCell)
 }

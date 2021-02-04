@@ -4,7 +4,6 @@ object RoomConstants {
     const val DB_VERSION = 1
     const val DB_NAME = "cells.db"
     const val TABLE_CELLS = "cells_table"
-    const val TABLE_WIDGETS = "widgets_table"
     const val SHORTCUT = "favorite"
     const val APP_WIDGET = "appwidget"
     const val TAG_ID = "tag_id"
@@ -14,6 +13,7 @@ object RoomConstants {
     const val TAG_CELL_X = "tag_cell_x"
     const val TAG_CELL_Y = "tag_cell_y"
     const val TAG_DESKTOP_NUMBER = "tag_desktop_number"
+    const val TAG_ITEM_TYPE = "tag_item_type"
     const val TAG_SPAN_X = "tag_span_x"
     const val TAG_SPAN_Y = "tag_span_y"
 }

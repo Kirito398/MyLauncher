@@ -47,6 +47,8 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         App.appComponent.injectLauncher(this)
 
+        lifecycle.addObserver(presenter)
+
         presenter.setView(this)
         presenter.init()
     }
@@ -73,14 +75,16 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     override fun setListeners() {
-        workspace.setOnShortcutDataChangedListener { presenter.onItemShortcutDataChanged(it) }
+        workspace.setOnItemCellDataChangedListener { presenter.onItemCellDataChanged(it) }
         workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
         (hotSeat as HotSeat).setOnAllAppsButtonClickListener { selectWidget() }
     }
 
     override fun addShortcut(item: ItemShortcut) {
-        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
+        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
             findAreaInCellLayout(item)
+            presenter.addShortcutToUpdateQueue(item)
+        }
 
         val layout = when (item.container) {
             ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
@@ -112,8 +116,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         item.desktopNumber = desktopNumber
         item.cellX = position[0]
         item.cellY = position[1]
-
-        presenter.addShortcutToUpdateQueue(item)
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
@@ -140,9 +142,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             e.printStackTrace()
             "App's not installed!".showToast()
         }
-//        val launcherApp = getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps? ?: return
-//        item.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        launcherApp.startMainActivity(item.intent.component, item.user, item.intent.sourceBounds, null)
     }
 
     private fun openDeleteAppDialog(item: ItemShortcut) {
@@ -162,7 +161,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         private const val REQUEST_CREATE_APPWIDGET = 2
         private const val REQUEST_BIND_APPWIDGET = 3
         private const val REQUEST_PICK_APPWIDGET = 4
-        private const val EXTRA_APPWIDGET_MODEL = "extra_appwidget_model"
     }
 
     override fun addWidget(widget: ItemWidget) {
@@ -183,7 +181,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetProvider)
-                //putExtra(EXTRA_APPWIDGET_MODEL, widget)
             }
 
             addWidgetToQueue(appWidgetId, widget)
@@ -217,7 +214,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_BIND_APPWIDGET) {
                 data?.extras?.let {
-                    //val widget = it.getParcelable<ItemWidget>(EXTRA_APPWIDGET_MODEL) ?: return@let
                     val appWidgetId = it.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
                     val widget = addingWidgetQueue[appWidgetId] ?: return@let
 
@@ -255,10 +251,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         if (item.cellHSpan < 0 || item.cellVSpan < 0)
             (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
-            //(workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, maxHeight, maxWidth)
 
-        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0)
+        if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
             findAreaInCellLayout(item)
+            presenter.saveWidget(item)
+        }
 
         val layout = workspace.getChildAt(item.desktopNumber) as? CellLayout ?: return
         val widgetView = appWidgetHost.createView(applicationContext, appWidgetId, appWidgetInfo)

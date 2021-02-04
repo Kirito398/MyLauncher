@@ -39,7 +39,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
     private var dropTargetCell = mutableListOf(-1, -1)
 
-    private var onShortcutDataChangedListener: ((ItemCell) -> Unit)? = null
+    private var onItemCellDataChangedListener: ((ItemCell) -> Unit)? = null
     private var hotSeat: HotSeat? = null
 
     fun setup(dragController: DragController) {
@@ -52,8 +52,8 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         this.hotSeat = hotSeat
     }
 
-    fun setOnShortcutDataChangedListener(func: (ItemCell) -> Unit) {
-        onShortcutDataChangedListener = func
+    fun setOnItemCellDataChangedListener(func: (ItemCell) -> Unit) {
+        onItemCellDataChangedListener = func
     }
 
     fun setOnShortcutLongPressListener(listener: (View) -> Unit) {
@@ -242,7 +242,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             (dragView as TextView).setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
         }
 
-        onShortcutDataChangedListener?.invoke(item)
+        onItemCellDataChangedListener?.invoke(item)
     }
 
     private fun moveView(view: View) {

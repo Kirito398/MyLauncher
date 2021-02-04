@@ -18,7 +18,13 @@ data class CellEntity(
     @ColumnInfo(name = RoomConstants.TAG_CELL_Y)
     val cellY: Int,
     @ColumnInfo(name = RoomConstants.TAG_DESKTOP_NUMBER)
-    val desktopNumber: Int
+    val desktopNumber: Int,
+    @ColumnInfo(name = RoomConstants.TAG_ITEM_TYPE)
+    val type: Int,
+    @ColumnInfo(name = RoomConstants.TAG_SPAN_X)
+    val spanX: Int = 1,
+    @ColumnInfo(name = RoomConstants.TAG_SPAN_Y)
+    val spanY: Int = 1
 ) {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = RoomConstants.TAG_ID)

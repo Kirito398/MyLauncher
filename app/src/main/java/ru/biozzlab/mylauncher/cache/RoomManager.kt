@@ -15,26 +15,24 @@ import ru.biozzlab.mylauncher.cache.RoomConstants.APP_WIDGET
 import ru.biozzlab.mylauncher.cache.RoomConstants.DB_VERSION
 import ru.biozzlab.mylauncher.cache.RoomConstants.SHORTCUT
 import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_CELLS
-import ru.biozzlab.mylauncher.cache.RoomConstants.TABLE_WIDGETS
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_X
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CELL_Y
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CLASS_NAME
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_CONTAINER
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_DESKTOP_NUMBER
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_ID
+import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_ITEM_TYPE
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_PACKAGE_NAME
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_SPAN_X
 import ru.biozzlab.mylauncher.cache.RoomConstants.TAG_SPAN_Y
 import ru.biozzlab.mylauncher.cache.daos.CellDao
-import ru.biozzlab.mylauncher.cache.daos.WidgetDao
 import ru.biozzlab.mylauncher.cache.entities.CellEntity
-import ru.biozzlab.mylauncher.cache.entities.WidgetEntity
 import ru.biozzlab.mylauncher.domain.types.ContainerType
+import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 
-@Database(entities = [CellEntity::class, WidgetEntity::class], version = DB_VERSION)
+@Database(entities = [CellEntity::class], version = DB_VERSION)
 abstract class RoomManager : RoomDatabase() {
     abstract fun cellDao(): CellDao
-    abstract fun widgetDao(): WidgetDao
 
     companion object {
         private var INSTANCE: RoomManager? = null
@@ -107,6 +105,7 @@ abstract class RoomManager : RoomDatabase() {
 
         private fun addShortcut(context: Context, db: SupportSQLiteDatabase, values: ContentValues) {
             if (context.packageManager.getLaunchIntentForPackage(values.getAsString(TAG_PACKAGE_NAME)) == null) return
+            values.put(TAG_ITEM_TYPE, WorkspaceItemType.SHORTCUT.type)
             db.insert(TABLE_CELLS, SQLiteDatabase.CONFLICT_REPLACE, values)
         }
 
@@ -114,10 +113,11 @@ abstract class RoomManager : RoomDatabase() {
             val spanX = attrs.getInt(R.styleable.Favorite_spanX, 1)
             val spanY = attrs.getInt(R.styleable.Favorite_spanY, 1)
 
+            values.put(TAG_ITEM_TYPE, WorkspaceItemType.WIDGET.type)
             values.put(TAG_SPAN_X, spanX)
             values.put(TAG_SPAN_Y, spanY)
 
-            db.insert(TABLE_WIDGETS, SQLiteDatabase.CONFLICT_REPLACE, values)
+            db.insert(TABLE_CELLS, SQLiteDatabase.CONFLICT_REPLACE, values)
         }
     }
 }

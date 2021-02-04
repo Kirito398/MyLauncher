@@ -9,17 +9,17 @@ import ru.biozzlab.mylauncher.domain.interfaces.Repository
 class DomainModule {
 
     @Provides
-    fun provideLoadCellsUseCase(repository: Repository): LoadCells = LoadCells(repository)
-
-    @Provides
     fun provideLoadWorkSpaceItems(repository: Repository): LoadWorkSpaceItems = LoadWorkSpaceItems(repository)
 
     @Provides
-    fun provideUpdateShortcut(repository: Repository): UpdateShortcut = UpdateShortcut(repository)
+    fun provideUpdateShortcut(repository: Repository): UpdateCell = UpdateCell(repository)
 
     @Provides
     fun provideIsWorkspaceInit(repository: Repository): IsWorkspaceInit = IsWorkspaceInit(repository)
 
     @Provides
-    fun provideSaveShortcuts(repository: Repository): SaveShortcuts = SaveShortcuts(repository)
+    fun provideSaveShortcuts(repository: Repository): SaveCells = SaveCells(repository)
+
+    @Provides
+    fun provideInsertCell(repository: Repository): InsertCell = InsertCell(repository)
 }

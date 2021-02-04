@@ -2,6 +2,7 @@ package ru.biozzlab.mylauncher.presenters
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.interactor.*
 import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
@@ -15,9 +16,11 @@ import java.lang.Exception
 
 class LauncherPresenter(
     private val loadWorkspaceItems: LoadWorkSpaceItems,
-    private val updateShortcut: UpdateShortcut,
+    private val updateCell: UpdateCell,
     private val isWorkspaceInit: IsWorkspaceInit,
-    private val saveShortcuts: SaveShortcuts) : LauncherViewContract.Presenter {
+    private val saveCells: SaveCells,
+    private val insertCell: InsertCell) : LauncherViewContract.Presenter {
+
     private lateinit var view: LauncherViewContract.View
     private val shortcutsTempList = mutableListOf<ItemCell>()
 
@@ -63,9 +66,8 @@ class LauncherPresenter(
     }
 
     private fun onInitWorkspaceFinished() {
-        saveShortcuts(SaveShortcuts.Params(shortcutsTempList)) {
-            if (it.isRight) shortcutsTempList.clear()
-        }
+        saveCells(SaveCells.Params(shortcutsTempList.copy()))
+        shortcutsTempList.clear()
     }
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {
@@ -117,12 +119,16 @@ class LauncherPresenter(
         )
     }
 
-    override fun onItemShortcutDataChanged(item: ItemCell) {
-        updateShortcut(UpdateShortcut.Params(item))
+    override fun onItemCellDataChanged(item: ItemCell) {
+        updateCell(UpdateCell.Params(item))
     }
 
     override fun addShortcutToUpdateQueue(item: ItemCell) {
         shortcutsTempList.add(item)
+    }
+
+    override fun saveWidget(item: ItemCell) {
+        insertCell(InsertCell.Params(item))
     }
 
     private fun onCellsLoaded(cells: MutableList<ItemCell>) {
@@ -132,18 +138,7 @@ class LauncherPresenter(
                 WorkspaceItemType.WIDGET -> view.addWidget(ItemWidget(cell))
             }
         }
-
-//        val shortcuts = convertCellsToShortcuts(cells)
-//        for (shortcut in shortcuts)
-//            view.addShortcut(shortcut)
     }
-
-//    private fun convertCellsToShortcuts(cells: List<ItemCell>): List<ItemShortcut> {
-//        val list = mutableListOf<ItemShortcut>()
-//        for (cell in cells)
-//            list.add(ItemShortcut(cell))
-//        return list
-//    }
 
     private fun onCellsLoadFailed(none: None) {
         //TODO
