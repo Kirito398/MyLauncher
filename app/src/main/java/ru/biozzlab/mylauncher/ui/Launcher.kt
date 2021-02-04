@@ -82,8 +82,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun addShortcut(item: ItemShortcut) {
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
-            findAreaInCellLayout(item)
-            presenter.addShortcutToUpdateQueue(item)
+            if (findAreaInCellLayout(item))
+                presenter.addShortcutToUpdateQueue(item)
+            else
+                return
         }
 
         val layout = when (item.container) {
@@ -109,13 +111,20 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         workspace.visibility = if (!visible) View.VISIBLE else View.GONE
     }
 
-    private fun findAreaInCellLayout(item: ItemCell) {
+    private fun findAreaInCellLayout(item: ItemCell): Boolean {
         val position = mutableListOf(-1, -1)
         val desktopNumber = workspace.findEmptyArea(position, item.cellHSpan, item.cellVSpan)
+
+        if (desktopNumber < 0) {
+            "Нет свободного места!".showToast()
+            return false
+        }
 
         item.desktopNumber = desktopNumber
         item.cellX = position[0]
         item.cellY = position[1]
+
+        return true
     }
 
     private fun createShortcut(parent: ViewGroup, item: ItemShortcut): View? {
@@ -253,8 +262,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
 
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
-            findAreaInCellLayout(item)
-            presenter.saveWidget(item)
+            if (findAreaInCellLayout(item))
+                presenter.saveWidget(item)
+            else
+                return
         }
 
         val layout = workspace.getChildAt(item.desktopNumber) as? CellLayout ?: return
