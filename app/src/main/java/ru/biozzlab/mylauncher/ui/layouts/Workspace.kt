@@ -66,23 +66,13 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         view.isClickable = false
         this.dragView = view
 
-        //dragOutline = createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
-        //dragOutline = (dragView.tag as ItemShortcut).iconBitmap!!
-
-        val item = dragView.tag
-        dragOutline = when (item) {
-            is ItemShortcut -> item.iconBitmap!!
-            is ItemWidget -> createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
-            else -> createDragOutline(view, Canvas(), DRAG_BITMAP_PADDING)
-        }
-
         beginDragShared(view)
     }
 
     private fun beginDragShared(view: View) {
-        val bitmap = createDragBitmap(view, Canvas(), DRAG_BITMAP_PADDING)
-        val width = bitmap.width
-        val height = bitmap.height
+        dragOutline = createDragBitmap(view, Canvas(), DRAG_BITMAP_PADDING)
+        val width = dragOutline.width
+        val height = dragOutline.height
 
         val dragLayer = (parent as DragLayer)
         val location = mutableListOf<Float>()
@@ -98,7 +88,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             context,
             view,
             dragLayer,
-            bitmap,
+            dragOutline,
             dragLayerX,
             dragLayerY,
             this,
@@ -107,7 +97,6 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             spanX,
             spanY
         )
-        bitmap.recycle()
     }
 
     private fun createDragBitmap(view: View, canvas: Canvas, dragBitmapPadding: Int): Bitmap {
@@ -155,22 +144,6 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             view.draw(canvas)
         }
         canvas.restore()
-    }
-
-    private fun createDragOutline(view: View, canvas: Canvas, padding: Int): Bitmap {
-        //val outlineColor = resources.getColor(android.R.color.white)
-
-        val bitmap = Bitmap.createBitmap(
-            view.width + padding,
-            view.height + padding,
-            Bitmap.Config.ARGB_8888
-        )
-
-        canvas.setBitmap(bitmap)
-        drawDragView(view, canvas, padding, true)
-        canvas.setBitmap(null)
-
-        return bitmap
     }
 
     override fun onAttachedToWindow() {

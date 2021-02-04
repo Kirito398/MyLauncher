@@ -262,7 +262,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         widgetView.setAppWidget(appWidgetId, appWidgetInfo)
         val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
         widgetView.layoutParams = params
-        widgetView.tag = item
+        widgetView.tag = ItemWidget(item)
 
         widgetView.setOnLongClickListener {
             workspace.startDrag(it)
