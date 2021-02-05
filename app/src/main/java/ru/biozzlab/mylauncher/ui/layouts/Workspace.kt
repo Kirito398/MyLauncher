@@ -170,9 +170,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragTargetLayout = getCurrentDragTargetLayout(dragObject)
 
         dragObject.dragView?.let {
+            val isWidget = it.tag is ItemWidget
             val targetCell = dragTargetLayout.findNearestArea(dragObject.x, dragObject.y, dragObject.spanX, dragObject.spanY)
             dropTargetCell.copy(targetCell)
-            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetCell, it.dragRegion, it.tag is ItemWidget)
+            dragTargetLayout.setDragOutlineBitmap(dragOutline, targetCell, it.dragRegion, isWidget)
         }
     }
 

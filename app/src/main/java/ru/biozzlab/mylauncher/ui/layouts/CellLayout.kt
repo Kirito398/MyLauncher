@@ -105,9 +105,11 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     }
 
     fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect, isWidget: Boolean) {
+        if (position[0] < 0 || position[1] < 0) return
+
         cellToPoint(position[0], position[1], position)
 
-        var left = position[0] //+ (cellWidth - dragRegion.width()) / 2
+        var left = position[0]
         val top = position[1]
 
         if (!isWidget) left += (cellWidth - dragRegion.width()) / 2
