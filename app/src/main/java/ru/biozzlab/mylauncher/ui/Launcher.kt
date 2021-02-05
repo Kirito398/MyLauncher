@@ -82,10 +82,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun addShortcut(item: ItemShortcut) {
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
-            if (findAreaInCellLayout(item))
+            if (findAreaInCellLayout(item)) {
                 presenter.addShortcutToUpdateQueue(item)
-            else
-                return
+            } else return
         }
 
         val layout = when (item.container) {
@@ -262,10 +261,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
 
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
-            if (findAreaInCellLayout(item))
+            if (findAreaInCellLayout(item)) {
+                snapToDesktop(item.desktopNumber)
                 presenter.saveWidget(item)
-            else
-                return
+            } else return
         }
 
         val layout = workspace.getChildAt(item.desktopNumber) as? CellLayout ?: return
@@ -281,6 +280,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         }
 
         layout.addViewToCell(widgetView, -1, 30, params, false)
+    }
+
+    private fun snapToDesktop(desktopNumber: Int) {
+        if (workspace.getCurrentPageNumber() != desktopNumber)
+            workspace.snapToPage(desktopNumber)
     }
 
     private fun configureWidget(appWidgetId: Int) {

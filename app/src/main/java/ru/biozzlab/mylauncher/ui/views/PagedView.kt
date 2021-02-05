@@ -210,7 +210,9 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         return nearestPage
     }
 
-    private fun snapToPage(page: Int) {
+    fun getCurrentPageNumber() = currentPage
+
+    fun snapToPage(page: Int) {
         val toPage = max(0, min(page, childCount - 1))
         val newX = getChildOffset(toPage) - getRelativeChildOffset(toPage)
         val sX = unboundedScrollX
