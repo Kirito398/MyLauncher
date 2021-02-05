@@ -29,6 +29,7 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
     protected var currentPage = 0
     private var pageSpacingValue: Int = 0
     private var isFirstLayout = true
+    private var isNeedSnapToDefaultPage = true
 
     private var touchState = TouchStates.REST
     private var activePointerId = -1
@@ -218,7 +219,8 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
     fun getCurrentPageNumber() = currentPage
 
     fun snapToDefaultPage() {
-        snapToPage(defaultPage)
+        if (currentPage != defaultPage) snapToPage(defaultPage)
+        isNeedSnapToDefaultPage = false
     }
 
     fun snapToPage(page: Int) {
@@ -334,7 +336,7 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
         }
 
         invalidateCachedOffsets()
-        snapToDefaultPage()
+        if (isNeedSnapToDefaultPage) snapToDefaultPage()
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
