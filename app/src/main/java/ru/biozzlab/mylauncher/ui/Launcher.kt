@@ -305,6 +305,15 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         appWidgetHost.startListening()
     }
 
+    override fun onBackPressed() {
+        workspace.snapToDefaultPage()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        workspace.snapToDefaultPage()
+    }
+
     override fun onStop() {
         super.onStop()
         appWidgetHost.stopListening()

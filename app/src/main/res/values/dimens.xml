@@ -5,6 +5,7 @@
     <dimen name="app_icon_border_radius">5dp</dimen>
 
     <dimen name="workspace_cell_width_land">106dp</dimen>
+    <integer name="workspace_default_page">2</integer>
 
     <integer name="cell_layout_column_count">4</integer>
     <integer name="cell_layout_row_count">5</integer>

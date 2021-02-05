@@ -9,8 +9,8 @@ import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.domain.types.TouchStates
 import kotlin.math.*
 
-abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
-    : ViewGroup(context, attrs, defStyle), ViewGroup.OnHierarchyChangeListener {
+abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle: Int)
+    : ViewGroup(context, attributeSet, defStyle), ViewGroup.OnHierarchyChangeListener {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
 
@@ -19,6 +19,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         const val PAGE_SNAP_ANIMATION_DURATION = 550
     }
 
+    private val defaultPage: Int
     private val childOffset = mutableListOf<Int>()
     private val childRelativeOffset = mutableListOf<Int>()
     private val childOffsetWithLayoutScale = mutableListOf<Int>()
@@ -45,6 +46,10 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
     init {
         isHapticFeedbackEnabled = false
+
+        val attrs = context.obtainStyledAttributes(attributeSet, R.styleable.PagedView)
+        defaultPage = attrs.getInt(R.styleable.PagedView_defaultPage, 0)
+        attrs.recycle()
 
         invalidateCachedOffsets()
 
@@ -212,6 +217,10 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
     fun getCurrentPageNumber() = currentPage
 
+    fun snapToDefaultPage() {
+        snapToPage(defaultPage)
+    }
+
     fun snapToPage(page: Int) {
         val toPage = max(0, min(page, childCount - 1))
         val newX = getChildOffset(toPage) - getRelativeChildOffset(toPage)
@@ -325,6 +334,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         }
 
         invalidateCachedOffsets()
+        snapToDefaultPage()
     }
 
     override fun dispatchDraw(canvas: Canvas?) {
