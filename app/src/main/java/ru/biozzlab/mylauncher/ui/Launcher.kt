@@ -39,6 +39,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var dragController: DragController
     private lateinit var appWidgetHost: LauncherAppWidgetHost
     private lateinit var appWidgetManager: AppWidgetManager
+    private var isWorkspaceVisible = true
 
     private var addingWidgetQueue = mutableMapOf<Int, ItemWidget>()
 
@@ -300,22 +301,24 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.let { if (intent.hasCategory(Intent.CATEGORY_HOME) && isWorkspaceVisible) workspace.snapToDefaultPage()}
+    }
+
     override fun onStart() {
         super.onStart()
         appWidgetHost.startListening()
+        isWorkspaceVisible = true
     }
 
     override fun onBackPressed() {
         workspace.snapToDefaultPage()
     }
 
-    override fun onPause() {
-        super.onPause()
-        workspace.snapToDefaultPage()
-    }
-
     override fun onStop() {
         super.onStop()
         appWidgetHost.stopListening()
+        isWorkspaceVisible = false
     }
 }

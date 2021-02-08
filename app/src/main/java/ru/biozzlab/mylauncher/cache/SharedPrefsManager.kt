@@ -1,7 +1,6 @@
 package ru.biozzlab.mylauncher.cache
 
 import android.content.SharedPreferences
-import ru.biozzlab.mylauncher.App
 import ru.bis.entities.Either
 import ru.bis.entities.None
 import javax.inject.Inject
