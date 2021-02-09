@@ -1,6 +1,7 @@
 package ru.biozzlab.mylauncher.ui
 
 import android.app.Activity
+import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
@@ -26,10 +27,11 @@ import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.HotSeat
-import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
+import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.widgets.LauncherAppWidgetHost
 import javax.inject.Inject
+
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     @Inject
@@ -135,7 +137,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         view.setOnLongClickListener { workspace.startDrag(it); return@setOnLongClickListener false }
         view.setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
 
-        val name = packageManager.getActivityInfo(ComponentName(item.packageName, item.className), 0).loadLabel(packageManager).toString()
+        val name = packageManager.getActivityInfo(
+            ComponentName(item.packageName, item.className),
+            0
+        ).loadLabel(packageManager).toString()
         item.title = name
 
         view.text = item.title
@@ -199,12 +204,22 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     private fun addWidgetToQueue(appWidgetId: Int, widget: ItemWidget) {
         addingWidgetQueue[appWidgetId] = widget
-        (workspace.getChildAt(widget.desktopNumber) as CellLayout).setCellsReserved(widget.cellX, widget.cellY, widget.cellHSpan, widget.cellVSpan)
+        (workspace.getChildAt(widget.desktopNumber) as CellLayout).setCellsReserved(
+            widget.cellX,
+            widget.cellY,
+            widget.cellHSpan,
+            widget.cellVSpan
+        )
     }
 
     private fun removeWidgetFromQueue(appWidgetId: Int) {
         addingWidgetQueue[appWidgetId]?.run {
-            (workspace.getChildAt(desktopNumber) as CellLayout).removeCellsReserve(cellX, cellY, cellHSpan, cellVSpan)
+            (workspace.getChildAt(desktopNumber) as CellLayout).removeCellsReserve(
+                cellX,
+                cellY,
+                cellHSpan,
+                cellVSpan
+            )
             addingWidgetQueue.remove(appWidgetId)
         }
     }
@@ -259,7 +274,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
             )
 
         if (item.cellHSpan < 0 || item.cellVSpan < 0)
-            (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(item, appWidgetInfo.minHeight, appWidgetInfo.minWidth)
+            (workspace.getChildAt(0) as CellLayout).calculateItemDimensions(
+                item,
+                appWidgetInfo.minHeight,
+                appWidgetInfo.minWidth
+            )
 
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
             if (findAreaInCellLayout(item)) {
@@ -321,4 +340,9 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         appWidgetHost.stopListening()
         isWorkspaceVisible = false
     }
+
+//    fun removeWidget(hostView: AppWidgetHostView) {
+//        mAppWidgetHost.deleteAppWidgetId(hostView.appWidgetId)
+//        layout.removeView(hostView)
+//    }
 }
