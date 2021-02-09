@@ -6,6 +6,6 @@ import ru.bis.entities.AsyncUseCase
 import ru.bis.entities.Either
 import ru.bis.entities.None
 
-class LoadCells(private val repository: Repository) : AsyncUseCase<MutableList<ItemCell>, None, None>() {
-    override suspend fun run(params: None): Either<None, MutableList<ItemCell>> = repository.loadShortcuts()
+class LoadWorkSpaceItems(private val repository: Repository) : AsyncUseCase<MutableList<ItemCell>, None, None>() {
+    override suspend fun run(params: None): Either<None, MutableList<ItemCell>> = repository.loadCells()
 }

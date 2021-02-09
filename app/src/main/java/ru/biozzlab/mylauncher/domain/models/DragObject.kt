@@ -5,7 +5,9 @@ import ru.biozzlab.mylauncher.ui.views.DragView
 
 data class DragObject(
     var x: Int = -1,
-    var y: Int = -1
+    var y: Int = -1,
+    var spanX: Int = 1,
+    var spanY: Int = 1
 ) {
     lateinit var dragSource: DragSource
     var dragView: DragView? = null

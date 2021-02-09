@@ -7,17 +7,24 @@
         <attr name="widthGap" format="dimension"/>
         <attr name="heightGap" format="dimension"/>
         <attr name="maxGap" format="dimension"/>
+        <attr name="columnCount" format="dimension"/>
+        <attr name="rowCount" format="dimension"/>
     </declare-styleable>
 
     <declare-styleable name="HotSeat">
         <attr name="cellCountX"/>
         <attr name="cellCountY"/>
         <attr name="menuButtonPosition" format="integer"/>
+        <attr name="showMenuButton" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="Workspace">
         <attr name="cellCountX" format="integer"/>
         <attr name="cellCountY" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="PagedView">
+        <attr name="defaultPage" format="integer"/>
     </declare-styleable>
 
     <declare-styleable name="Favorite">
@@ -27,6 +34,8 @@
         <attr name="container" format="integer" />
         <attr name="x" format="integer" />
         <attr name="y" format="integer" />
+        <attr name="spanX" format="integer" />
+        <attr name="spanY" format="integer" />
         <attr name="desktopNumber" format="integer" />
     </declare-styleable>
 

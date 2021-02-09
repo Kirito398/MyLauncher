@@ -5,20 +5,21 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.LauncherApps
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.PaintDrawable
 import android.os.UserHandle
 import android.os.UserManager
+import androidx.core.content.ContextCompat
 import ru.biozzlab.mylauncher.App
 import ru.biozzlab.mylauncher.R
+import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.views.IconDrawable
 
 class ItemShortcut(cell: ItemCell) : ItemCell(
     cell.id,
+    cell.type,
     cell.container,
     cell.packageName,
     cell.className,
@@ -29,7 +30,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
     cell.cellVSpan
 ) {
     lateinit var intent: Intent
-    var icon: IconDrawable? = null
+    val icon: IconDrawable? get() = initIcon()
     var iconBitmap: Bitmap? = null
     var title: String = ""
 
@@ -47,7 +48,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
     }
 
-    private fun initIcon() {
+    private fun initIcon(): IconDrawable? {
         val userManager = App.appContext.getSystemService(Context.USER_SERVICE) as UserManager
         val users = userManager.userProfiles
 
@@ -61,16 +62,21 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         val launcherActivityInfo = launcherApps.resolveActivity(intent, currentUser)
         val iconDensity = (App.appContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager).launcherLargeIconDensity
 
-        launcherActivityInfo?.run {
-            icon = IconDrawable(createIconBitmap(getBadgedIcon(iconDensity)))
-        }
+        return launcherActivityInfo?.run { IconDrawable(createIconBitmap(getIcon(iconDensity))) }
     }
 
     private fun createIconBitmap(icon: Drawable): Bitmap {
-        var width: Int = App.appContext.resources.getDimension(R.dimen.app_icon_size).toInt()
+        val resources = App.appContext.resources
+
+        val paint = Paint()
+        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_color)
+
+        val iconBorderRadius = resources.getDimension(R.dimen.app_icon_border_radius)
+        val iconPadding = resources.getDimension(R.dimen.app_icon_padding).toInt()
+        var width: Int = resources.getDimension(R.dimen.app_icon_size).toInt()
         var height: Int = width
-        val textureWidth = width
-        val textureHeight = width
+        val textureWidth = width + iconPadding
+        val textureHeight = width + iconPadding
 
         when(icon) {
             is PaintDrawable -> {
@@ -104,9 +110,20 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
             }
         }
 
+        val matrix = ColorMatrix()
+        matrix.setSaturation(0F)
+
+        val filter = ColorMatrixColorFilter(matrix)
+        paint.colorFilter = filter
+
         val bitmap = Bitmap.createBitmap(textureWidth, textureHeight, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas()
-        canvas.setBitmap(bitmap)
+        val canvas = Canvas(bitmap)
+
+        if (container != ContainerType.HOT_SEAT) {
+            canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+        } else {
+            icon.colorFilter = filter
+        }
 
         val left = (textureWidth - width) / 2
         val top = (textureHeight - height) / 2

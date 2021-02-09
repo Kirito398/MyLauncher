@@ -12,9 +12,9 @@ import androidx.core.view.children
 import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.calculateDistance
+import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.max
 
 class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     : ViewGroup(context, attributeSet, defStyle) {
@@ -34,11 +34,17 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private var widthGap: Int = -1
     private var heightGap: Int = -1
 
-
     private var interceptTouchListener: OnTouchListener? = null
     private var dragOutlineBitmap: Bitmap? = null
     private var dragOutlineRect: Rect = Rect(-1, -1, -1, -1)
     private var dragOutlinePaint: Paint
+
+    private var reservedCells = mutableListOf<Pair<Int, Int>>()
+
+    private val testCellPosition = Point(-1, -1)
+    private val testDragViewPosition = Point(-1, -1)
+    private val testPaint = Paint()
+    private val isDebug = false
 
     private val container: CellContainer = CellContainer(context)
 
@@ -52,10 +58,9 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         cellHeight = attrs.getDimensionPixelSize(R.styleable.CellLayout_cellHeight, 10)
         widthGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_widthGap, 0)
         heightGap = attrs.getDimensionPixelSize(R.styleable.CellLayout_heightGap, 0)
+        columnCount = attrs.getInt(R.styleable.CellLayout_columnCount, DEFAULT_COLUMN_COUNT)
+        rowCount = attrs.getInt(R.styleable.CellLayout_rowCount, DEFAULT_ROW_COUNT)
         attrs.recycle()
-
-        columnCount = DEFAULT_COLUMN_COUNT
-        rowCount = DEFAULT_ROW_COUNT
 
         dragOutlinePaint = Paint()
         dragOutlinePaint.alpha = DRAG_OUTLINE_PAINT_ALPHA
@@ -73,10 +78,12 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         view.scaleX = 1.0F
         view.scaleY = 1.0F
 
-        if (params.showText)
-            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.workspace_icon_text_color))
-        else
-            (view as TextView).setTextColor(ContextCompat.getColor(context, R.color.hot_seat_text_color))
+        if (view is TextView) {
+            if (params.showText)
+                view.setTextColor(ContextCompat.getColor(context, R.color.workspace_icon_text_color))
+            else
+                view.setTextColor(ContextCompat.getColor(context, R.color.hot_seat_text_color))
+        }
 
         if (params.cellX >= 0 && params.cellX <= columnCount - 1 && params.cellY >= 0 && params.cellY <= rowCount - 1) {
             if (params.cellHSpan < 0) params.cellHSpan = columnCount
@@ -97,16 +104,33 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         requestLayout()
     }
 
-    fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect) {
+    fun setDragOutlineBitmap(bitmap: Bitmap, position: MutableList<Int>, dragRegion: Rect, isWidget: Boolean) {
+        if (position[0] < 0 || position[1] < 0) return
+
         cellToPoint(position[0], position[1], position)
 
-        val left = position[0] + (cellWidth - dragRegion.width()) / 2
+        var left = position[0]
         val top = position[1]
+
+        if (!isWidget) left += (cellWidth - dragRegion.width()) / 2
 
         dragOutlineBitmap = bitmap
         dragOutlineRect.set(left, top, left + dragOutlineBitmap!!.width, top + dragOutlineBitmap!!.height)
 
         invalidate() //TODO проверить как это сделано в исходниках
+    }
+
+    fun setCellsReserved(cellX: Int, cellY: Int, cellHSpan: Int = 1, cellVSpan: Int = 1) {
+        for (i in 0 until cellHSpan)
+            for (j in 0 until cellVSpan)
+                reservedCells.add(Pair(cellX + i, cellY + j))
+    }
+
+    fun removeCellsReserve(cellX: Int, cellY: Int, cellHSpan: Int = 1, cellVSpan: Int = 1) {
+        for (i in 0 until cellHSpan)
+            for (j in 0 until cellVSpan)
+                if (reservedCells.contains(Pair(cellX + i, cellY + j)))
+                    reservedCells.remove(Pair(cellX + i, cellY + j))
     }
 
     fun deleteDragOutlineBitmap() {
@@ -120,24 +144,38 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         position[1] = paddingTop + cellY * (cellHeight + heightGap)
     }
 
-    fun findNearestArea(x: Int, y: Int): MutableList<Int> {
+    fun findNearestArea(x: Int, y: Int, spanX: Int = 1, spanY: Int = 1): MutableList<Int> {
         var minDistance = Double.MAX_VALUE
         val point = mutableListOf(-1, -1)
         val cellPositions = getCellsPosition()
 
         for (row in 0 until rowCount) {
             for (column in 0 until columnCount) {
-                if (cellPositions.contains(Pair(column, row))) continue
+                if (column + spanX > columnCount || row + spanY > rowCount) continue
+
+                var isCellEmpty = true
+                for (i in 0 until spanX)
+                    for (j in 0 until spanY)
+                        if (cellPositions.contains(Pair(column + i, row + j))) isCellEmpty = false
+
+                if (!isCellEmpty) continue
 
                 val cellPosition = mutableListOf(-1, -1)
                 cellToPoint(column, row, cellPosition)
 
                 val centerX = x - cellWidth / 2
-                val centerY = y - cellHeight / 2
+                val centerY = y + cellHeight / 2
+                val cellCenterX = cellPosition[0] + cellWidth / 2
+                val cellCenterY = cellPosition[1] + cellHeight / 2
 
-                val distance = calculateDistance(Point(cellPosition[0], cellPosition[1]), Point(centerX, centerY))
+                val distance = calculateDistance(Point(cellCenterX, cellCenterY), Point(centerX, centerY))
 
                 if (distance >= minDistance) continue
+
+                testCellPosition.x = cellCenterX
+                testCellPosition.y = cellCenterY
+                testDragViewPosition.x = centerX
+                testDragViewPosition.y = centerY
 
                 minDistance = distance
                 point[0] = column
@@ -151,10 +189,15 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     private fun getCellsPosition(): MutableList<Pair<Int, Int>> {
         val positions = mutableListOf<Pair<Int, Int>>()
 
+        positions.addAll(reservedCells)
+
         for (child in container.children) {
             if (child.visibility != View.VISIBLE) continue
             val params = child.layoutParams as CellLayoutParams
-            positions.add(Pair(params.cellX, params.cellY))
+
+            for (i in 0 until params.cellHSpan)
+                for (j in 0 until params.cellVSpan)
+                    positions.add(Pair(params.cellX + i, params.cellY + j))
         }
 
         return positions
@@ -163,6 +206,57 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
     override fun onDraw(canvas: Canvas?) {
         dragOutlineBitmap?.let {
             canvas?.drawBitmap(it, null, dragOutlineRect, dragOutlinePaint)
+        }
+
+        if (isDebug) {
+            testPaint.style = Paint.Style.FILL_AND_STROKE
+            drawCellsPositions(canvas, testPaint)
+            drawTestDistanceLine(canvas, testPaint)
+            drawCellsBoundsRect(canvas, testPaint)
+        }
+    }
+
+    private fun drawTestDistanceLine(canvas: Canvas?, paint: Paint) {
+        paint.color = Color.parseColor("#FF0000")
+        canvas?.drawLine(testCellPosition.x.toFloat(), testCellPosition.y.toFloat(), testDragViewPosition.x.toFloat(), testDragViewPosition.y.toFloat(), paint)
+
+        paint.color = Color.parseColor("#00FF00")
+        canvas?.drawCircle(testCellPosition.x.toFloat(), testCellPosition.y.toFloat(), 10F, paint)
+
+        paint.color = Color.parseColor("#0000FF")
+        canvas?.drawCircle(testDragViewPosition.x.toFloat(), testDragViewPosition.y.toFloat(), 10F, paint)
+    }
+
+    private fun drawCellsBoundsRect(canvas: Canvas?, paint: Paint) {
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.parseColor("#FF0000")
+
+        for (child in container.children) {
+            if (child.visibility != View.VISIBLE) continue
+            val clipBounds = Rect()
+            child.getDrawingRect(clipBounds)
+
+            val x = child.x.toInt() + paddingStart
+            val y = child.y.toInt() + paddingTop
+
+            clipBounds.left = x
+            clipBounds.top = y
+            clipBounds.bottom = y + child.height
+            clipBounds.right = x + child.width
+            canvas?.drawRect(clipBounds, paint)
+        }
+    }
+
+    private fun drawCellsPositions(canvas: Canvas?, paint: Paint) {
+        val positions = getCellsPosition()
+        paint.color = Color.parseColor("#FF0000")
+
+        for (position in positions) {
+            val cellPoint = mutableListOf(-1, -1)
+            cellToPoint(position.first, position.second, cellPoint)
+            val cellCenterX = cellPoint[0] + cellWidth / 2
+            val cellCenterY = cellPoint[1] + cellHeight / 2
+            canvas?.drawCircle(cellCenterX.toFloat(), cellCenterY.toFloat(), 10F, paint)
         }
     }
 
@@ -215,4 +309,18 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
             = CellLayoutParams(p)
 
     override fun checkLayoutParams(p: ViewGroup.LayoutParams?): Boolean = p is CellLayoutParams
+
+    fun calculateItemDimensions(item: ItemCell, height: Int, width: Int) {
+        item.cellHSpan = getCellCount(width)
+        item.cellVSpan = getCellCount(height)
+    }
+
+    private fun getCellCount(size: Int): Int {
+        val max = max(columnCount, rowCount)
+        for (i in 1 .. max) {
+            val cellHeight = cellHeight * i
+            if (cellHeight > size) return i
+        }
+        return max
+    }
 }

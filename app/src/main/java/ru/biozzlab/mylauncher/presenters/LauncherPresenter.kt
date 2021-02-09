@@ -2,23 +2,25 @@ package ru.biozzlab.mylauncher.presenters
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import ru.biozzlab.mylauncher.domain.interactor.IsWorkspaceInit
-import ru.biozzlab.mylauncher.domain.interactor.LoadCells
-import ru.biozzlab.mylauncher.domain.interactor.SaveShortcuts
-import ru.biozzlab.mylauncher.domain.interactor.UpdateShortcut
+import ru.biozzlab.mylauncher.copy
+import ru.biozzlab.mylauncher.domain.interactor.*
 import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.models.ItemShortcut
+import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
+import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.bis.entities.Either
 import ru.bis.entities.None
 import java.lang.Exception
 
 class LauncherPresenter(
-    private val loadCells: LoadCells,
-    private val updateShortcut: UpdateShortcut,
+    private val loadWorkspaceItems: LoadWorkSpaceItems,
+    private val updateCell: UpdateCell,
     private val isWorkspaceInit: IsWorkspaceInit,
-    private val saveShortcuts: SaveShortcuts) : LauncherViewContract.Presenter {
+    private val saveCells: SaveCells,
+    private val insertCell: InsertCell) : LauncherViewContract.Presenter {
+
     private lateinit var view: LauncherViewContract.View
     private val shortcutsTempList = mutableListOf<ItemCell>()
 
@@ -40,7 +42,7 @@ class LauncherPresenter(
     private fun initWorkspace(isFirstRun: Boolean) {
         view.setWorkspaceInitProgressBarVisibility(true)
 
-        loadCells(None()) {
+        loadWorkspaceItems(None()) {
             it.either({}, { appList ->
                 if (isFirstRun)
                     onStartWorkspaceInit(appList)
@@ -64,7 +66,8 @@ class LauncherPresenter(
     }
 
     private fun onInitWorkspaceFinished() {
-        saveShortcuts(SaveShortcuts.Params(shortcutsTempList))
+        saveCells(SaveCells.Params(shortcutsTempList.copy()))
+        shortcutsTempList.clear()
     }
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {
@@ -104,6 +107,7 @@ class LauncherPresenter(
 
         return ItemCell(
             -1,
+            WorkspaceItemType.SHORTCUT,
             ContainerType.DESKTOP,
             info.packageName,
             packageManager.getLaunchIntentForPackage(info.packageName)?.component?.className ?: "",
@@ -115,25 +119,25 @@ class LauncherPresenter(
         )
     }
 
-    override fun onItemShortcutDataChanged(item: ItemShortcut) {
-        updateShortcut(UpdateShortcut.Params(item))
+    override fun onItemCellDataChanged(item: ItemCell) {
+        updateCell(UpdateCell.Params(item))
     }
 
-    override fun addShortcutToUpdateQueue(item: ItemShortcut) {
+    override fun addShortcutToUpdateQueue(item: ItemCell) {
         shortcutsTempList.add(item)
     }
 
-    private fun onCellsLoaded(cells: MutableList<ItemCell>) {
-        val shortcuts = convertCellsToShortcuts(cells)
-        for (shortcut in shortcuts)
-            view.addShortcut(shortcut)
+    override fun saveWidget(item: ItemCell) {
+        insertCell(InsertCell.Params(item))
     }
 
-    private fun convertCellsToShortcuts(cells: List<ItemCell>): List<ItemShortcut> {
-        val list = mutableListOf<ItemShortcut>()
-        for (cell in cells)
-            list.add(ItemShortcut(cell))
-        return list
+    private fun onCellsLoaded(cells: MutableList<ItemCell>) {
+        for (cell in cells) {
+            when (cell.type) {
+                WorkspaceItemType.SHORTCUT -> view.addShortcut(ItemShortcut(cell))
+                WorkspaceItemType.WIDGET -> view.addWidget(ItemWidget(cell))
+            }
+        }
     }
 
     private fun onCellsLoadFailed(none: None) {

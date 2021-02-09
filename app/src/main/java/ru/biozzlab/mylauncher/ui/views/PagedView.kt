@@ -9,8 +9,8 @@ import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.domain.types.TouchStates
 import kotlin.math.*
 
-abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
-    : ViewGroup(context, attrs, defStyle), ViewGroup.OnHierarchyChangeListener {
+abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle: Int)
+    : ViewGroup(context, attributeSet, defStyle), ViewGroup.OnHierarchyChangeListener {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
 
@@ -19,6 +19,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         const val PAGE_SNAP_ANIMATION_DURATION = 550
     }
 
+    private val defaultPage: Int
     private val childOffset = mutableListOf<Int>()
     private val childRelativeOffset = mutableListOf<Int>()
     private val childOffsetWithLayoutScale = mutableListOf<Int>()
@@ -28,6 +29,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     protected var currentPage = 0
     private var pageSpacingValue: Int = 0
     private var isFirstLayout = true
+    private var isNeedSnapToDefaultPage = true
 
     private var touchState = TouchStates.REST
     private var activePointerId = -1
@@ -46,10 +48,20 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     init {
         isHapticFeedbackEnabled = false
 
+        val attrs = context.obtainStyledAttributes(attributeSet, R.styleable.PagedView)
+        defaultPage = attrs.getInt(R.styleable.PagedView_defaultPage, 0)
+        attrs.recycle()
+
         invalidateCachedOffsets()
 
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledTouchSlop
+
+        hierarchyChangeListener()
+    }
+
+    private fun hierarchyChangeListener() {
+        setOnHierarchyChangeListener(this)
     }
 
     private fun initScrollIndicator() {
@@ -149,7 +161,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
 
     private fun snapToDestination(event: MotionEvent): Boolean {
         when (touchState) {
-            TouchStates.REST -> TODO()
+            TouchStates.REST -> { }//TODO()
             TouchStates.SCROLLING -> {
                 val pointerIndex = event.findPointerIndex(activePointerId)
                 val x = event.getX(pointerIndex)
@@ -204,7 +216,14 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         return nearestPage
     }
 
-    private fun snapToPage(page: Int) {
+    fun getCurrentPageNumber() = currentPage
+
+    fun snapToDefaultPage() {
+        if (currentPage != defaultPage) snapToPage(defaultPage)
+        isNeedSnapToDefaultPage = false
+    }
+
+    fun snapToPage(page: Int) {
         val toPage = max(0, min(page, childCount - 1))
         val newX = getChildOffset(toPage) - getRelativeChildOffset(toPage)
         val sX = unboundedScrollX
@@ -300,9 +319,9 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        if (widthMode != MeasureSpec.EXACTLY)
-            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
+//        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+//        if (widthMode != MeasureSpec.EXACTLY)
+//            throw IllegalStateException("Workspace can only be used in EXACTLY mode")
 
 //        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
 //        if (heightMode != MeasureSpec.EXACTLY)
@@ -317,6 +336,7 @@ abstract class PagedView(context: Context, attrs: AttributeSet, defStyle: Int)
         }
 
         invalidateCachedOffsets()
+        if (isNeedSnapToDefaultPage) snapToDefaultPage()
     }
 
     override fun dispatchDraw(canvas: Canvas?) {

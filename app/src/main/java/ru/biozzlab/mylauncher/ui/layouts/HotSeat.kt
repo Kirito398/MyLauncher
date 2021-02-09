@@ -1,6 +1,7 @@
 package ru.biozzlab.mylauncher.ui.layouts
 
 import android.content.Context
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
@@ -21,11 +22,16 @@ class HotSeat : FrameLayout {
         cellCountX = attrs.getInt(R.styleable.HotSeat_cellCountX, -1)
         cellCountY = attrs.getInt(R.styleable.HotSeat_cellCountY, -1)
         menuButtonPosition = attrs.getInt(R.styleable.HotSeat_menuButtonPosition, 2)
+        menuButtonIsVisible = attrs.getBoolean(R.styleable.HotSeat_showMenuButton, true)
+
+        attrs.recycle()
     }
 
     private val cellCountX: Int
     private val cellCountY: Int
     private val menuButtonPosition: Int
+    private val menuButtonIsVisible: Boolean
+    private lateinit var onAllAppsButtonClickedListener: () -> Unit
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -36,17 +42,32 @@ class HotSeat : FrameLayout {
 
     fun getCellLayout(): CellLayout = hotSeatContent
 
+    fun setOnAllAppsButtonClickListener(listener: () -> Unit) {
+        onAllAppsButtonClickedListener = listener
+    }
+
     private fun resetLayout() {
         hotSeatContent.removeAllViewsInLayout()
+
+        if (!menuButtonIsVisible) return
 
         val inflater = LayoutInflater.from(context)
         val allAppsButton = inflater.inflate(R.layout.item_application, hotSeatContent, false) as TextView
         allAppsButton.setCompoundDrawablesWithIntrinsicBounds(null, ContextCompat.getDrawable(context, all_apps_button_icon), null, null)
         allAppsButton.contentDescription = "Apps"
 
-        allAppsButton.setOnClickListener { "OnAllAppsButtonClicked!".easyLog(this) }
+        allAppsButton.setOnClickListener {
+            "OnAllAppsButtonClicked!".easyLog(this)
+            if (::onAllAppsButtonClickedListener.isInitialized) onAllAppsButtonClickedListener()
+        }
 
-        val params = CellLayoutParams(menuButtonPosition, 0, 1, 1)
+        var cellX = 0
+        var cellY = 0
+
+        if (context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) cellY = menuButtonPosition
+        else cellX = menuButtonPosition
+
+        val params = CellLayoutParams(cellX, cellY, 1, 1)
         hotSeatContent.addViewToCell(allAppsButton, -1, 0, params, true)
     }
 }

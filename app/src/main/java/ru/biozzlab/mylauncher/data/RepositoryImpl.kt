@@ -6,8 +6,9 @@ import ru.bis.entities.Either
 import ru.bis.entities.None
 
 class RepositoryImpl(private val cache: Cache) : Repository {
-    override fun loadShortcuts(): Either<None, MutableList<ItemCell>> = cache.loadShortcuts()
-    override fun updateShortcuts(shortcut: ItemCell): Either<None, None> = cache.updateShortcut(shortcut)
+    override fun insertCell(itemCell: ItemCell): Either<None, ItemCell> = cache.insertCell(itemCell)
+    override fun updateCell(itemCell: ItemCell): Either<None, None> = cache.updateCell(itemCell)
+    override fun loadCells(): Either<None, MutableList<ItemCell>> = cache.loadCells()
     override fun isWorkspaceInit(): Either<None, Boolean> = cache.getIsWorkspaceInit()
-    override fun saveShortcuts(shortcuts: MutableList<ItemCell>): Either<None, MutableList<ItemCell>> = cache.saveShortcuts(shortcuts)
+    override fun saveCells(cells: MutableList<ItemCell>): Either<None, MutableList<ItemCell>> = cache.saveCells(cells)
 }

@@ -3,6 +3,9 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="main_background_color">#71A8E0</color>
     <color name="workspace_icon_text_color">#FFFFFF</color>
     <color name="hot_seat_text_color">#00FFFFFF</color>
+    <color name="app_icon_background_color">#400085FF</color>
 </resources>
