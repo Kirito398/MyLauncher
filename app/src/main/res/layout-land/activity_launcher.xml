@@ -53,16 +53,6 @@
 
         </ru.biozzlab.mylauncher.ui.layouts.Workspace>
 
-        <ProgressBar
-            android:id="@+id/pbWorkspaceInit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/workspaceView"
-            app:layout_constraintBottom_toBottomOf="@id/workspaceView"
-            app:layout_constraintStart_toStartOf="@id/workspaceView"
-            app:layout_constraintEnd_toEndOf="@id/workspaceView"
-            android:visibility="invisible"/>
-
         <ImageView
             android:id="@+id/ivPageIndicator"
             android:layout_width="wrap_content"
@@ -81,9 +71,29 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/workspaceView"
             app:layout_constraintHorizontal_weight="1"/>
 
+
+        <include
+            layout="@layout/item_delete_region"
+            android:id="@+id/deleteRegion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
+
     </ru.biozzlab.mylauncher.ui.layouts.DragLayer>
+
+    <ProgressBar
+        android:id="@+id/pbWorkspaceInit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

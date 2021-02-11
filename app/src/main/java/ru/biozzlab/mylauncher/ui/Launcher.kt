@@ -1,7 +1,6 @@
 package ru.biozzlab.mylauncher.ui
 
 import android.app.Activity
-import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
@@ -23,6 +22,7 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
+import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
@@ -31,7 +31,6 @@ import ru.biozzlab.mylauncher.ui.layouts.Workspace
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.widgets.LauncherAppWidgetHost
 import javax.inject.Inject
-
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     @Inject
@@ -69,8 +68,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         dragController = DragController()
 
-        workspace.setup(dragController)
-        workspace.setHotSeat(hotSeat as HotSeat)
+        workspace.setup(dragController, hotSeat as HotSeat, deleteRegion)
         dragLayer.setup(dragController)
 
         appWidgetHost = LauncherAppWidgetHost(applicationContext, 1024)
@@ -79,7 +77,13 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
     override fun setListeners() {
         workspace.setOnItemCellDataChangedListener { presenter.onItemCellDataChanged(it) }
-        workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
+        //workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
+        workspace.setOnItemDeleteListener {
+            when (it) {
+                is ItemShortcut -> openDeleteAppDialog(it)
+                is ItemWidget -> deleteWidget(it)
+            }
+        }
         (hotSeat as HotSeat).setOnAllAppsButtonClickListener { selectWidget() }
     }
 
@@ -159,6 +163,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     private fun openDeleteAppDialog(item: ItemShortcut) {
+        "Delete App".easyLog(this)
         val packageURI = Uri.parse("package:${item.packageName}")
         val intent = Intent(Intent.ACTION_DELETE, packageURI)
         startActivity(intent)
@@ -292,7 +297,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         widgetView.setAppWidget(appWidgetId, appWidgetInfo)
         val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
         widgetView.layoutParams = params
-        widgetView.tag = ItemWidget(item)
+
+        val widgetItem = ItemWidget(item)
+        widgetItem.appWidgetId = appWidgetId
+        widgetView.tag = widgetItem
 
         widgetView.setOnLongClickListener {
             workspace.startDrag(it)
@@ -318,6 +326,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         } else {
             createWidget(appWidgetId)
         }
+    }
+
+    private fun deleteWidget(itemWidget: ItemWidget) {
+        "WidgetDelete".easyLog(this)
+        appWidgetHost.deleteAppWidgetId(itemWidget.appWidgetId)
     }
 
     override fun onNewIntent(intent: Intent?) {
