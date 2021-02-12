@@ -9,6 +9,7 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
+import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.bis.entities.Either
 import ru.bis.entities.None
@@ -24,6 +25,7 @@ class LauncherPresenter(
 
     private lateinit var view: LauncherViewContract.View
     private val shortcutsTempList = mutableListOf<ItemCell>()
+    private val loadedCellsList = mutableListOf<ItemCell>()
 
     override fun setView(view: LauncherViewContract.View) {
         this.view = view
@@ -47,8 +49,10 @@ class LauncherPresenter(
             it.either({}, { appList ->
                 if (isFirstRun)
                     onStartWorkspaceInit(appList)
-                else
+                else {
                     onCellsLoaded(appList)
+                    findNewPackages()
+                }
 
                 view.setWorkspaceInitProgressBarVisibility(false)
             })
@@ -56,8 +60,7 @@ class LauncherPresenter(
     }
 
     private fun onStartWorkspaceInit(defaultAppList: MutableList<ItemCell>) {
-        val packageManager = view.getPackageManager()
-        val allAppList = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
+        val allAppList = getInstalledApplications()
         val newAppList = removeDuplicateApp(allAppList, defaultAppList)
 
         defaultAppList.addAll(newAppList)
@@ -140,10 +143,24 @@ class LauncherPresenter(
         shortcutsTempList.clear()
     }
 
-    private fun onCellsLoaded(cells: MutableList<ItemCell>) {
+    override fun findNewPackages() {
+        val installedApps = getInstalledApplications()
+        if (installedApps.size <= loadedCellsList.size) return
+        onCellsLoaded(removeDuplicateApp(installedApps, loadedCellsList), false)
+        "Find new package!".easyLog(this)
+    }
+
+    private fun getInstalledApplications() = checkForLaunchIntent(view.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA))
+
+    private fun onCellsLoaded(cells: MutableList<ItemCell>, clearLoadedList: Boolean = true) {
+        if (clearLoadedList) loadedCellsList.clear()
+
         for (cell in cells) {
             when (cell.type) {
-                WorkspaceItemType.SHORTCUT -> view.addShortcut(ItemShortcut(cell))
+                WorkspaceItemType.SHORTCUT -> {
+                    view.addShortcut(ItemShortcut(cell))
+                    loadedCellsList.add(cell)
+                }
                 WorkspaceItemType.WIDGET -> view.addWidget(ItemWidget(cell))
             }
         }

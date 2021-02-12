@@ -26,5 +26,6 @@ interface LauncherViewContract {
         fun saveItem(item: ItemCell)
         fun deleteItem(item: ItemCell)
         fun saveShortcutsFromTempList()
+        fun findNewPackages()
     }
 }
