@@ -147,6 +147,7 @@ class LauncherPresenter(
         val installedApps = getInstalledApplications()
         if (installedApps.size <= loadedCellsList.size) return
         onCellsLoaded(removeDuplicateApp(installedApps, loadedCellsList), false)
+        saveShortcutsFromTempList()
         "Find new package!".easyLog(this)
     }
 
