@@ -74,6 +74,17 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         interceptTouchListener = listener
     }
 
+    fun findViewInContainer(packageName: String): View? {
+        for (child in container.children)
+            if ((child.tag as ItemCell).packageName == packageName)
+                return child
+        return null
+    }
+
+    fun removeViewFromContainer(view: View) {
+        container.removeView(view)
+    }
+
     fun addViewToCell(view: View, index: Int, id: Int, params: CellLayoutParams, markCells: Boolean): Boolean {
         view.scaleX = 1.0F
         view.scaleY = 1.0F

@@ -22,4 +22,7 @@ class DomainModule {
 
     @Provides
     fun provideInsertCell(repository: Repository): InsertCell = InsertCell(repository)
+
+    @Provides
+    fun provideDeleteCell(repository: Repository): DeleteCell = DeleteCell(repository)
 }

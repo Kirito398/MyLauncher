@@ -10,4 +10,5 @@ interface Repository {
     fun loadCells(): Either<None, MutableList<ItemCell>>
     fun isWorkspaceInit(): Either<None, Boolean>
     fun saveCells(shortcuts: MutableList<ItemCell>): Either<None, MutableList<ItemCell>>
+    fun deleteCell(itemCell: ItemCell): Either<None, None>
 }

@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.children
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
@@ -271,6 +272,15 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         }
 
         return childNumber
+    }
+
+    fun removeViewWithPackages(packageName: String): ItemCell? {
+        for (child in children) {
+            val view = (child as CellLayout).findViewInContainer(packageName) ?: continue
+            child.removeViewFromContainer(view)
+            return view.tag as ItemCell
+        }
+        return null
     }
 
     private fun getCurrentDragTargetLayout(dragObject: DragObject): CellLayout {

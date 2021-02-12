@@ -10,6 +10,6 @@ import ru.biozzlab.mylauncher.presenters.LauncherPresenter
 class PresentationModule {
 
     @Provides
-    fun provideLauncherPresenter(loadWorkSpaceItems: LoadWorkSpaceItems, updateCell: UpdateCell, isWorkspaceInit: IsWorkspaceInit, saveCells: SaveCells, insertCell: InsertCell): LauncherViewContract.Presenter
-            = LauncherPresenter(loadWorkSpaceItems, updateCell, isWorkspaceInit, saveCells, insertCell)
+    fun provideLauncherPresenter(loadWorkSpaceItems: LoadWorkSpaceItems, updateCell: UpdateCell, isWorkspaceInit: IsWorkspaceInit, saveCells: SaveCells, insertCell: InsertCell, deleteCell: DeleteCell): LauncherViewContract.Presenter
+            = LauncherPresenter(loadWorkSpaceItems, updateCell, isWorkspaceInit, saveCells, insertCell, deleteCell)
 }

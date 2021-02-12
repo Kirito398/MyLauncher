@@ -19,7 +19,8 @@ class LauncherPresenter(
     private val updateCell: UpdateCell,
     private val isWorkspaceInit: IsWorkspaceInit,
     private val saveCells: SaveCells,
-    private val insertCell: InsertCell) : LauncherViewContract.Presenter {
+    private val insertCell: InsertCell,
+    private val deleteCell: DeleteCell) : LauncherViewContract.Presenter {
 
     private lateinit var view: LauncherViewContract.View
     private val shortcutsTempList = mutableListOf<ItemCell>()
@@ -66,8 +67,7 @@ class LauncherPresenter(
     }
 
     private fun onInitWorkspaceFinished() {
-        saveCells(SaveCells.Params(shortcutsTempList.copy()))
-        shortcutsTempList.clear()
+        saveShortcutsFromTempList()
     }
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {
@@ -127,8 +127,17 @@ class LauncherPresenter(
         shortcutsTempList.add(item)
     }
 
-    override fun saveWidget(item: ItemCell) {
+    override fun saveItem(item: ItemCell) {
         insertCell(InsertCell.Params(item))
+    }
+
+    override fun deleteItem(item: ItemCell) {
+        deleteCell(DeleteCell.Params(item))
+    }
+
+    override fun saveShortcutsFromTempList() {
+        saveCells(SaveCells.Params(shortcutsTempList.copy()))
+        shortcutsTempList.clear()
     }
 
     private fun onCellsLoaded(cells: MutableList<ItemCell>) {

@@ -11,4 +11,5 @@ class RepositoryImpl(private val cache: Cache) : Repository {
     override fun loadCells(): Either<None, MutableList<ItemCell>> = cache.loadCells()
     override fun isWorkspaceInit(): Either<None, Boolean> = cache.getIsWorkspaceInit()
     override fun saveCells(cells: MutableList<ItemCell>): Either<None, MutableList<ItemCell>> = cache.saveCells(cells)
+    override fun deleteCell(itemCell: ItemCell): Either<None, None> = cache.deleteCell(itemCell)
 }
