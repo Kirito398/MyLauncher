@@ -6,11 +6,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cellCountX="@integer/hot_seat_column_count"
     app:cellCountY="@integer/hot_seat_row_count"
-    app:showMenuButton="@bool/hot_seat_menu_button_visible">
+    app:showMenuButton="@bool/hot_seat_menu_button_visible"
+    app:menuButtonPosition="@integer/hot_seat_menu_button_position"
+    android:background="@drawable/ic_hotseat_background">
 
     <ru.biozzlab.mylauncher.ui.layouts.CellLayout
         android:id="@+id/hotSeatContent"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:paddingTop="@dimen/hot_seat_padding_top"

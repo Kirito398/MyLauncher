@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="app_icon_size">90dp</dimen>
+    <dimen name="app_icon_padding">20dp</dimen>
+
+    <dimen name="cell_layout_cell_width">160dp</dimen>
+    <dimen name="cell_layout_cell_height">140dp</dimen>
+
+    <dimen name="hot_seat_cell_width">135dp</dimen>
+    <dimen name="hot_seat_cell_height">135dp</dimen>
+    <dimen name="hot_seat_padding_start">10dp</dimen>
+    <dimen name="hot_seat_height_gap">15dp</dimen>
+</resources>
