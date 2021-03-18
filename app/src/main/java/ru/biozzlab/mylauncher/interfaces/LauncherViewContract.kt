@@ -27,5 +27,6 @@ interface LauncherViewContract {
         fun deleteItem(item: ItemCell)
         fun saveShortcutsFromTempList()
         fun findNewPackages()
+        fun checkIsShortcutAlreadyAdded(packageName: String): Boolean
     }
 }

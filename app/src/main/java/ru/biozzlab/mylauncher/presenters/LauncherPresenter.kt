@@ -151,6 +151,9 @@ class LauncherPresenter(
         "Find new package!".easyLog(this)
     }
 
+    override fun checkIsShortcutAlreadyAdded(packageName: String) =
+        loadedCellsList.find { it.packageName == packageName } != null
+
     private fun getInstalledApplications() = checkForLaunchIntent(view.getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA))
 
     private fun onCellsLoaded(cells: MutableList<ItemCell>, clearLoadedList: Boolean = true) {

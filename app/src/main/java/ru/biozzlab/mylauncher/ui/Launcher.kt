@@ -95,6 +95,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     private fun addShortcut(packageName: String) {
+        if (presenter.checkIsShortcutAlreadyAdded(packageName)) return
         val className = packageManager.getLaunchIntentForPackage(packageName)?.component?.className ?: return
         val itemCell = ItemCell(
             type = WorkspaceItemType.SHORTCUT,
@@ -339,11 +340,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         layout.addViewToCell(widgetView, -1, 30, params, false)
     }
 
-    private fun snapToDesktop(desktopNumber: Int) {
-        if (workspace.getCurrentPageNumber() != desktopNumber)
-            workspace.snapToPage(desktopNumber)
-    }
-
     private fun configureWidget(appWidgetId: Int) {
         val appWidgetInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
 
@@ -361,6 +357,12 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         "WidgetDelete".easyLog(this)
         appWidgetHost.deleteAppWidgetId(itemWidget.appWidgetId)
         presenter.deleteItem(itemWidget)
+    }
+    /**-------Конец - Работа с виджетами-------*/
+
+    private fun snapToDesktop(desktopNumber: Int) {
+        if (workspace.getCurrentPageNumber() != desktopNumber)
+            workspace.snapToPage(desktopNumber)
     }
 
     override fun onNewIntent(intent: Intent?) {
