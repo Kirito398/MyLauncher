@@ -5,7 +5,8 @@
 
     <dimen name="app_icon_size">60dp</dimen>
     <dimen name="app_icon_padding">20dp</dimen>
-    <dimen name="app_icon_border_radius">10dp</dimen>
+    <dimen name="app_icon_border_radius">6dp</dimen>
+    <dimen name="app_icon_border_stroke">1dp</dimen>
 
     <dimen name="cell_layout_padding_top">60dp</dimen>
     <dimen name="cell_layout_padding_start">50dp</dimen>

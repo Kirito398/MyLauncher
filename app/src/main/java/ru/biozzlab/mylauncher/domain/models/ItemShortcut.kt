@@ -68,11 +68,9 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
     private fun createIconBitmap(icon: Drawable): Bitmap {
         val resources = App.appContext.resources
 
-        val paint = Paint()
-        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_color)
-
         val iconBorderRadius = resources.getDimension(R.dimen.app_icon_border_radius)
         val iconPadding = resources.getDimension(R.dimen.app_icon_padding).toInt()
+        val iconStroke = resources.getDimension(R.dimen.app_icon_border_stroke)
         var width: Int = resources.getDimension(R.dimen.app_icon_size).toInt()
         var height: Int = width
         val textureWidth = width + iconPadding
@@ -110,18 +108,25 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
             }
         }
 
-        val matrix = ColorMatrix()
-        matrix.setSaturation(0F)
-
-        val filter = ColorMatrixColorFilter(matrix)
-        paint.colorFilter = filter
-
         val bitmap = Bitmap.createBitmap(textureWidth, textureHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
-        if (container != ContainerType.HOT_SEAT) {
-            canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
-        } else {
+        val paint = Paint()
+        paint.isAntiAlias = true
+
+        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_color)
+        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+
+        paint.style = Paint.Style.STROKE
+        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_stroke_color)
+        paint.strokeWidth = iconStroke
+        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+
+        if (container == ContainerType.HOT_SEAT) {
+            val matrix = ColorMatrix()
+            matrix.setSaturation(0F)
+
+            val filter = ColorMatrixColorFilter(matrix)
             icon.colorFilter = filter
         }
 
