@@ -11,8 +11,8 @@ import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
-import ru.bis.entities.Either
-import ru.bis.entities.None
+import ru.sir.core.Either
+import ru.sir.core.None
 import java.lang.Exception
 
 class LauncherPresenter(

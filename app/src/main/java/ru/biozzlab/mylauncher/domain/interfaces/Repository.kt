@@ -1,8 +1,8 @@
 package ru.biozzlab.mylauncher.domain.interfaces
 
 import ru.biozzlab.mylauncher.domain.models.ItemCell
-import ru.bis.entities.Either
-import ru.bis.entities.None
+import ru.sir.core.Either
+import ru.sir.core.None
 
 interface Repository {
     fun insertCell(itemCell: ItemCell): Either<None, ItemCell>

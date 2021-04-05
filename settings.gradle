@@ -1,3 +1,5 @@
 include ':app'
-include ':entities'
+include ':entities:presentation'
+include ':entities:core'
+include ':entities:data'
 rootProject.name = "MyLauncher"

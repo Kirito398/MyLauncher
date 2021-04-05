@@ -5,8 +5,8 @@ import ru.biozzlab.mylauncher.data.Cache
 import ru.biozzlab.mylauncher.domain.models.ItemCell
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
-import ru.bis.entities.Either
-import ru.bis.entities.None
+import ru.sir.core.Either
+import ru.sir.core.None
 
 class CacheImpl(private val roomManager: RoomManager, private val prefsManager: SharedPrefsManager) : Cache {
     override fun insertCell(itemCell: ItemCell): Either<None, ItemCell> {

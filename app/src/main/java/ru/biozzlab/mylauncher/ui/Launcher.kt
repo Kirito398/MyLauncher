@@ -396,9 +396,4 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     override fun onBackPressed() {
         workspace.snapToDefaultPage()
     }
-
-//    fun removeWidget(hostView: AppWidgetHostView) {
-//        mAppWidgetHost.deleteAppWidgetId(hostView.appWidgetId)
-//        layout.removeView(hostView)
-//    }
 }
