@@ -23,6 +23,10 @@ interface LauncherViewContract {
         fun init()
         fun onItemCellDataChanged(item: ItemCell)
         fun addShortcutToUpdateQueue(item: ItemCell)
-        fun saveWidget(item: ItemCell)
+        fun saveItem(item: ItemCell)
+        fun deleteItem(item: ItemCell)
+        fun saveShortcutsFromTempList()
+        fun findNewPackages()
+        fun checkIsShortcutAlreadyAdded(packageName: String): Boolean
     }
 }

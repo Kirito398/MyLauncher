@@ -10,4 +10,5 @@ interface Cache {
     fun updateCell(itemCell: ItemCell): Either<None, None>
     fun getIsWorkspaceInit(): Either<None, Boolean>
     fun saveCells(cells: MutableList<ItemCell>): Either<None, MutableList<ItemCell>>
+    fun deleteCell(itemCell: ItemCell): Either<None, None>
 }

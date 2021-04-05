@@ -1,11 +1,11 @@
 package ru.biozzlab.mylauncher.ui
 
 import android.app.Activity
-import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -23,15 +23,16 @@ import ru.biozzlab.mylauncher.domain.models.ItemShortcut
 import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
+import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.interfaces.LauncherViewContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.HotSeat
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
+import ru.biozzlab.mylauncher.ui.receivers.PackageStatusChangeReceiver
 import ru.biozzlab.mylauncher.ui.widgets.LauncherAppWidgetHost
 import javax.inject.Inject
-
 
 class Launcher : AppCompatActivity(), LauncherViewContract.View {
     @Inject
@@ -41,6 +42,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     private lateinit var dragController: DragController
     private lateinit var appWidgetHost: LauncherAppWidgetHost
     private lateinit var appWidgetManager: AppWidgetManager
+    private lateinit var appsReceiver: PackageStatusChangeReceiver
     private var isWorkspaceVisible = true
 
     private var addingWidgetQueue = mutableMapOf<Int, ItemWidget>()
@@ -69,18 +71,40 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
 
         dragController = DragController()
 
-        workspace.setup(dragController)
-        workspace.setHotSeat(hotSeat as HotSeat)
+        workspace.setup(dragController, hotSeat as HotSeat, deleteRegion)
         dragLayer.setup(dragController)
 
         appWidgetHost = LauncherAppWidgetHost(applicationContext, 1024)
         appWidgetManager = AppWidgetManager.getInstance(applicationContext)
+
+        appsReceiver = PackageStatusChangeReceiver()
     }
 
     override fun setListeners() {
+        appsReceiver.setOnInstallPackageListener { addShortcut(it) }
+        appsReceiver.setOnDeletePackageListener { deleteShortcut(it) }
         workspace.setOnItemCellDataChangedListener { presenter.onItemCellDataChanged(it) }
-        workspace.setOnShortcutLongPressListener { openDeleteAppDialog(it.tag as ItemShortcut) }
         (hotSeat as HotSeat).setOnAllAppsButtonClickListener { selectWidget() }
+
+        workspace.setOnItemDeleteListener {
+            when (it) {
+                is ItemShortcut -> openDeleteAppDialog(it)
+                is ItemWidget -> deleteWidget(it)
+            }
+        }
+    }
+
+    private fun addShortcut(packageName: String) {
+        if (presenter.checkIsShortcutAlreadyAdded(packageName)) return
+        val className = packageManager.getLaunchIntentForPackage(packageName)?.component?.className ?: return
+        val itemCell = ItemCell(
+            type = WorkspaceItemType.SHORTCUT,
+            container = ContainerType.DESKTOP,
+            packageName = packageName,
+            className = className
+        )
+        addShortcut(ItemShortcut(itemCell))
+        presenter.saveShortcutsFromTempList()
     }
 
     override fun addShortcut(item: ItemShortcut) {
@@ -93,6 +117,11 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         val layout = when (item.container) {
             ContainerType.HOT_SEAT -> hotSeat.hotSeatContent
             ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
+        }
+
+        if (packageManager.getLaunchIntentForPackage(item.packageName) == null) {
+            presenter.deleteItem(item)
+            return
         }
 
         val shortcut = createShortcut(layout, item) ?: return
@@ -159,9 +188,15 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
     }
 
     private fun openDeleteAppDialog(item: ItemShortcut) {
+        "Delete App".easyLog(this)
         val packageURI = Uri.parse("package:${item.packageName}")
         val intent = Intent(Intent.ACTION_DELETE, packageURI)
         startActivity(intent)
+    }
+
+    private fun deleteShortcut(packageName: String) {
+        val item = workspace.removeViewWithPackages(packageName) ?: return
+        presenter.deleteItem(item)
     }
 
     fun getDragLayer(): DragLayer = dragLayer
@@ -283,7 +318,7 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         if (item.desktopNumber < 0 || item.cellX < 0 || item.cellY < 0) {
             if (findAreaInCellLayout(item)) {
                 snapToDesktop(item.desktopNumber)
-                presenter.saveWidget(item)
+                presenter.saveItem(item)
             } else return
         }
 
@@ -292,7 +327,10 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         widgetView.setAppWidget(appWidgetId, appWidgetInfo)
         val params = CellLayoutParams(item.cellX, item.cellY, item.cellHSpan, item.cellVSpan)
         widgetView.layoutParams = params
-        widgetView.tag = ItemWidget(item)
+
+        val widgetItem = ItemWidget(item)
+        widgetItem.appWidgetId = appWidgetId
+        widgetView.tag = widgetItem
 
         widgetView.setOnLongClickListener {
             workspace.startDrag(it)
@@ -300,11 +338,6 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         }
 
         layout.addViewToCell(widgetView, -1, 30, params, false)
-    }
-
-    private fun snapToDesktop(desktopNumber: Int) {
-        if (workspace.getCurrentPageNumber() != desktopNumber)
-            workspace.snapToPage(desktopNumber)
     }
 
     private fun configureWidget(appWidgetId: Int) {
@@ -320,6 +353,18 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         }
     }
 
+    private fun deleteWidget(itemWidget: ItemWidget) {
+        "WidgetDelete".easyLog(this)
+        appWidgetHost.deleteAppWidgetId(itemWidget.appWidgetId)
+        presenter.deleteItem(itemWidget)
+    }
+    /**-------Конец - Работа с виджетами-------*/
+
+    private fun snapToDesktop(desktopNumber: Int) {
+        if (workspace.getCurrentPageNumber() != desktopNumber)
+            workspace.snapToPage(desktopNumber)
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let { if (intent.hasCategory(Intent.CATEGORY_HOME) && isWorkspaceVisible) workspace.snapToDefaultPage()}
@@ -331,14 +376,25 @@ class Launcher : AppCompatActivity(), LauncherViewContract.View {
         isWorkspaceVisible = true
     }
 
-    override fun onBackPressed() {
-        workspace.snapToDefaultPage()
+    override fun onResume() {
+        super.onResume()
+        val filters = IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED)
+            addDataScheme("package")
+        }
+        registerReceiver(appsReceiver, filters)
     }
 
     override fun onStop() {
         super.onStop()
         appWidgetHost.stopListening()
         isWorkspaceVisible = false
+        unregisterReceiver(appsReceiver)
+    }
+
+    override fun onBackPressed() {
+        workspace.snapToDefaultPage()
     }
 
 //    fun removeWidget(hostView: AppWidgetHostView) {

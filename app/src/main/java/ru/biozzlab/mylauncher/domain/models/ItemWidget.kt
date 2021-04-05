@@ -17,6 +17,7 @@ class ItemWidget(cell: ItemCell) : ItemCell(
     cell.cellHSpan,
     cell.cellVSpan
 ), Parcelable {
+    var appWidgetId: Int = -1
 
     constructor(parcel: Parcel) : this(ItemCell (
         parcel.readLong(),

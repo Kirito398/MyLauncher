@@ -30,6 +30,11 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
         return loadCells()
     }
 
+    override fun deleteCell(itemCell: ItemCell): Either<None, None> {
+        roomManager.cellDao().delete(convertModelToCellEntities(itemCell))
+        return Either.Right(None())
+    }
+
     private fun convertCellEntitiesToModel(entities: List<CellEntity>): Either<None, MutableList<ItemCell>> {
         val list = mutableListOf<ItemCell>()
         for (entity in entities)

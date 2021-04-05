@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.children
 import ru.biozzlab.mylauncher.controllers.DragController
 import ru.biozzlab.mylauncher.copy
 import ru.biozzlab.mylauncher.domain.models.DragObject
@@ -40,16 +41,18 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     private var dropTargetCell = mutableListOf(-1, -1)
 
     private var onItemCellDataChangedListener: ((ItemCell) -> Unit)? = null
-    private var hotSeat: HotSeat? = null
+    private var onItemDeleteListener: ((ItemCell) -> Unit)? = null
 
-    fun setup(dragController: DragController) {
+    private lateinit var hotSeat: HotSeat
+    private lateinit var deleteRegion: View
+
+    fun setup(dragController: DragController , hotSeat: HotSeat, deleteView: View) {
         this.dragController = dragController
         dragController.setDropTarget(this)
         dragController.setDragScroller(this)
-    }
 
-    fun setHotSeat(hotSeat: HotSeat) {
         this.hotSeat = hotSeat
+        this.deleteRegion = deleteView
     }
 
     fun setOnItemCellDataChangedListener(func: (ItemCell) -> Unit) {
@@ -60,11 +63,17 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         dragController.setOnLongPressListener { listener.invoke(dragView) }
     }
 
+    fun setOnItemDeleteListener(listener: (ItemCell) -> Unit) {
+        onItemDeleteListener = listener
+    }
+
     fun startDrag(view: View) {
         if (!view.isInTouchMode) return
         view.visibility = View.INVISIBLE
         view.isClickable = false
         this.dragView = view
+
+        showDeleteRegion(true)
 
         beginDragShared(view)
     }
@@ -179,6 +188,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
     override fun onDragExit(dragObject: DragObject) {
         dragTargetLayout.deleteDragOutlineBitmap()
+        showDeleteRegion(false)
     }
 
     override fun acceptDrop(dragObject: DragObject): Boolean = true
@@ -191,30 +201,40 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
 
         if (dropTargetCell[0] < 0 || dropTargetCell[1] < 0) return
 
+        if (checkInDeleteRegion(dragObject)) {
+            val item = dragView.tag as ItemCell
+            onItemDeleteListener?.invoke(item)
+            if (item is ItemWidget) (dragView.parent as CellContainer).removeView(dragView)
+            return
+        }
+
         val layoutParams = dragView.layoutParams as CellLayoutParams
         layoutParams.cellX = dropTargetCell[0]
         layoutParams.cellY = dropTargetCell[1]
         layoutParams.isDropped = true
         layoutParams.showText = !dragTargetLayout.isHotSeat
 
+        moveView(dragView)
         updateView()
         dragView.requestLayout()
     }
 
+    private fun checkInDeleteRegion(dragObject: DragObject): Boolean {
+        val hitRect = Rect()
+        deleteRegion.getHitRect(hitRect)
+        return hitRect.contains(dragObject.x, dragObject.y)
+    }
+
     private fun updateView() {
         val item = dragView.tag as ItemCell
-
-        //if (currentPage != shortcutItem.desktopNumber || dragTargetLayout.isHotSeat)
-            moveView(dragView)
 
         item.cellX = dropTargetCell[0]
         item.cellY = dropTargetCell[1]
         item.desktopNumber = currentPage
         item.container = if (dragTargetLayout.isHotSeat) ContainerType.HOT_SEAT else ContainerType.DESKTOP
 
-        if (item is ItemShortcut) {
+        if (item is ItemShortcut)
             (dragView as TextView).setCompoundDrawablesWithIntrinsicBounds(null, item.icon, null, null)
-        }
 
         onItemCellDataChangedListener?.invoke(item)
     }
@@ -254,10 +274,19 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         return childNumber
     }
 
+    fun removeViewWithPackages(packageName: String): ItemCell? {
+        for (child in children) {
+            val view = (child as CellLayout).findViewInContainer(packageName) ?: continue
+            child.removeViewFromContainer(view)
+            return view.tag as ItemCell
+        }
+        return null
+    }
+
     private fun getCurrentDragTargetLayout(dragObject: DragObject): CellLayout {
         var layout = getChildAt(currentPage) as CellLayout
 
-        hotSeat?.let {
+        hotSeat.let {
             val hitRect = Rect()
             it.getHitRect(hitRect)
 
@@ -269,6 +298,10 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             dragTargetLayout.deleteDragOutlineBitmap()
 
         return layout
+    }
+
+    private fun showDeleteRegion(show: Boolean) {
+        deleteRegion.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
     override fun onEnterScrollArea(x: Int, y: Int, direction: Int): Boolean = if (direction == 0) scrollLeft() else scrollRight()

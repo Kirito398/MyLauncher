@@ -5,7 +5,8 @@
 
     <dimen name="app_icon_size">60dp</dimen>
     <dimen name="app_icon_padding">20dp</dimen>
-    <dimen name="app_icon_border_radius">10dp</dimen>
+    <dimen name="app_icon_border_radius">6dp</dimen>
+    <dimen name="app_icon_border_stroke">1dp</dimen>
 
     <dimen name="cell_layout_padding_top">60dp</dimen>
     <dimen name="cell_layout_padding_start">50dp</dimen>
@@ -18,10 +19,11 @@
 
     <integer name="hot_seat_column_count">1</integer>
     <integer name="hot_seat_row_count">4</integer>
+    <integer name="hot_seat_menu_button_position">3</integer>
 
-    <dimen name="hot_seat_padding_top">10dp</dimen>
+    <dimen name="hot_seat_padding_top">60dp</dimen>
     <dimen name="hot_seat_padding_bottom">0dp</dimen>
-    <dimen name="hot_seat_padding_start">0dp</dimen>
+    <dimen name="hot_seat_padding_start">8dp</dimen>
     <dimen name="hot_seat_padding_end">0dp</dimen>
     <dimen name="hot_seat_cell_width">80dp</dimen>
     <dimen name="hot_seat_cell_height">80dp</dimen>

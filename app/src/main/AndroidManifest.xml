@@ -3,6 +3,7 @@
     package="ru.biozzlab.mylauncher">
 
     <uses-permission android:name="android.permission.BIND_APPWIDGET" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
     <application
         android:name=".App"
