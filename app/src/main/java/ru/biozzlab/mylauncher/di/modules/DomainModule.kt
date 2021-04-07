@@ -15,6 +15,9 @@ class DomainModule {
     fun provideUpdateShortcut(repository: Repository): UpdateCell = UpdateCell(repository)
 
     @Provides
+    fun provideUpdateCells(repository: Repository): UpdateCells = UpdateCells(repository)
+
+    @Provides
     fun provideIsWorkspaceInit(repository: Repository): IsWorkspaceInit = IsWorkspaceInit(repository)
 
     @Provides
@@ -25,4 +28,7 @@ class DomainModule {
 
     @Provides
     fun provideDeleteCell(repository: Repository): DeleteCell = DeleteCell(repository)
+
+    @Provides
+    fun provideWorkspaceItems(repository: Repository): WorkSpaceItems = WorkSpaceItems(repository)
 }

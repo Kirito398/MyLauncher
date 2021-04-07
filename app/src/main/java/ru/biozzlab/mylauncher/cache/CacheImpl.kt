@@ -1,5 +1,6 @@
 package ru.biozzlab.mylauncher.cache
 
+import kotlinx.coroutines.flow.*
 import ru.biozzlab.mylauncher.cache.entities.CellEntity
 import ru.biozzlab.mylauncher.data.Cache
 import ru.biozzlab.mylauncher.domain.models.ItemCell
@@ -15,17 +16,26 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
     }
 
     override fun loadCells(): Either<None, MutableList<ItemCell>> =
-        convertCellEntitiesToModel(roomManager.cellDao().getAllCells())
+        Either.Right(convertCellEntitiesToModel(roomManager.cellDao().getAllCells()))
 
-    override fun updateCell(itemCell: ItemCell): Either<None, None> {
+    override fun workspaceCells(): Flow<MutableList<ItemCell>> =
+        roomManager.cellDao().getAllCellsFlow()
+            .map { convertCellEntitiesToModel(it) }
+
+    override fun updateCell(itemCell: ItemCell): Either<None, ItemCell> {
         roomManager.cellDao().update(convertModelToCellEntities(itemCell))
-        return Either.Right(None())
+        return Either.Right(itemCell)
+    }
+
+    override fun updateCells(cells: List<ItemCell>): Either<None, List<ItemCell>> {
+        val item = roomManager.cellDao().updateList(convertModelToCellEntities(cells))
+        return Either.Right(cells)
     }
 
     override fun getIsWorkspaceInit(): Either<None, Boolean> = prefsManager.getIsWorkspaceInit()
 
-    override fun saveCells(cells: MutableList<ItemCell>): Either<None, MutableList<ItemCell>> {
-        for (shortcut in cells) roomManager.cellDao().insert(convertModelToCellEntities(shortcut))
+    override fun saveCells(cells: List<ItemCell>): Either<None, List<ItemCell>> {
+        roomManager.cellDao().insertList(convertModelToCellEntities(cells))
         prefsManager.setIsWorkspaceInit()
         return loadCells()
     }
@@ -35,24 +45,31 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
         return Either.Right(None())
     }
 
-    private fun convertCellEntitiesToModel(entities: List<CellEntity>): Either<None, MutableList<ItemCell>> {
+    private fun convertCellEntitiesToModel(entities: List<CellEntity>): MutableList<ItemCell> {
         val list = mutableListOf<ItemCell>()
-        for (entity in entities)
-            list.add(
-                ItemCell(
-                    entity.id,
-                    WorkspaceItemType.fromID(entity.type) ?: WorkspaceItemType.SHORTCUT,
-                ContainerType.fromID(entity.container) ?: ContainerType.DESKTOP,
-                    entity.packageName,
-                    entity.className,
-                    entity.cellX,
-                    entity.cellY,
-                    entity.desktopNumber,
-                    entity.spanX,
-                    entity.spanY
-                )
-            )
-        return Either.Right(list)
+        for (entity in entities) list.add(convertCellEntitiesToModel(entity))
+        return list
+    }
+
+    private fun convertCellEntitiesToModel(entity: CellEntity): ItemCell {
+        return ItemCell(
+            entity.id,
+            WorkspaceItemType.fromID(entity.type) ?: WorkspaceItemType.SHORTCUT,
+            ContainerType.fromID(entity.container) ?: ContainerType.DESKTOP,
+            entity.packageName,
+            entity.className,
+            entity.cellX,
+            entity.cellY,
+            entity.desktopNumber,
+            entity.spanX,
+            entity.spanY
+        )
+    }
+
+    private fun convertModelToCellEntities(models: List<ItemCell>): MutableList<CellEntity> {
+        val list = mutableListOf<CellEntity>()
+        for (model in models) list.add(convertModelToCellEntities(model))
+        return list
     }
 
     private fun convertModelToCellEntities(model: ItemCell): CellEntity {

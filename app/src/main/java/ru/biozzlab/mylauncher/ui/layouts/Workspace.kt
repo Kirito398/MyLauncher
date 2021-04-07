@@ -271,7 +271,15 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
             }
         }
 
+        reserveCell(childNumber, position, spanX, spanY)
+
         return childNumber
+    }
+
+    private fun reserveCell(childNumber: Int, position: List<Int>, spanX: Int = 1, spanY: Int = 1) {
+        if (childNumber < 0 || position[0] < 0 || position[1] < 0) return
+        val layout = getChildAt(childNumber) as CellLayout
+        layout.setCellsReserved(position[0], position[1], spanX, spanY)
     }
 
     fun removeViewWithPackages(packageName: String): ItemCell? {
