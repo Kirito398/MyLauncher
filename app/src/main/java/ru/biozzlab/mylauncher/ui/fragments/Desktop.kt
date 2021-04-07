@@ -169,18 +169,16 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
     override fun onStart() {
         super.onStart()
         appWidgetHost.startListening()
-        //isWorkspaceVisible = true
     }
 
     override fun onStop() {
         super.onStop()
         appWidgetHost.stopListening()
-//        isWorkspaceVisible = false
     }
 
-//    override fun onBackPressed() {
-//        workspace.snapToDefaultPage()
-//    }
+    override fun onBackPressed() {
+        workspace.snapToDefaultPage()
+    }
 
     /**-------Работа с виджетами-------*/
     companion object {

@@ -8,7 +8,7 @@ import ru.sir.presentation.base.BaseDaggerComponent
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ViewModelModule::class, PresentationModule::class, DomainModule::class, DataModule::class, CacheModule::class])
+@Component(modules = [ViewModelModule::class, DomainModule::class, DataModule::class, CacheModule::class])
 interface AppComponent : BaseDaggerComponent {
     fun injectLauncher(launcher: Launcher)
     fun injectDesktop(desktop: Desktop)

@@ -21,7 +21,7 @@ class Launcher : BaseActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        //intent?.let { if (intent.hasCategory(Intent.CATEGORY_HOME) && isWorkspaceVisible) workspace.snapToDefaultPage()}
+        intent?.let { if (intent.hasCategory(Intent.CATEGORY_HOME) && isWorkspaceVisible) super.onBackPressed()}
     }
 
     override fun onStart() {
@@ -32,9 +32,5 @@ class Launcher : BaseActivity() {
     override fun onStop() {
         super.onStop()
         isWorkspaceVisible = false
-    }
-
-    override fun onBackPressed() {
-        //workspace.snapToDefaultPage()
     }
 }

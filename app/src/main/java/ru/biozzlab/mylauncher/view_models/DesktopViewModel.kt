@@ -115,7 +115,7 @@ class DesktopViewModel @Inject constructor(
         val list = mutableListOf<ItemCell>()
         fromList.forEach { info ->
             val isNew = defaultAppList.find { it.packageName == info.packageName } == null
-            if (isNew) list.add(convertApplicationInfoToItemCell(info))
+            if (isNew) convertApplicationInfoToItemCell(info)?.let { list.add(it) }
         }
         return list
     }
@@ -145,14 +145,7 @@ class DesktopViewModel @Inject constructor(
         )
     }
 
-    private fun convertApplicationInfoToItemCell(info: ApplicationInfo): ItemCell {
-        return ItemCell(
-            type = WorkspaceItemType.SHORTCUT,
-            container = ContainerType.DESKTOP,
-            packageName = info.packageName,
-            className = context.packageManager.getLaunchIntentForPackage(info.packageName)?.component?.className ?: ""
-        )
-    }
+    private fun convertApplicationInfoToItemCell(info: ApplicationInfo): ItemCell? = createItemCellFromPackageName(info.packageName)
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {
         val launchApps = mutableListOf<ApplicationInfo>()
