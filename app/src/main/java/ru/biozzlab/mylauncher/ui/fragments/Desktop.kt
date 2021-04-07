@@ -25,7 +25,6 @@ import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.easyLog
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
-import ru.biozzlab.mylauncher.ui.layouts.DragLayer
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import ru.biozzlab.mylauncher.ui.widgets.LauncherAppWidgetHost
@@ -76,11 +75,13 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
             }
             viewModel.updateDesktop()
         }
+
+        viewModel.removedItems.launchWhenStarted(lifecycleScope) {
+            it.forEach { item -> workspace.removeViewWithPackages(item.packageName) }
+        }
     }
 
     override fun setListeners() {
-//        appsReceiver.setOnInstallPackageListener { addShortcut(it) }
-//        appsReceiver.setOnDeletePackageListener { deleteShortcut(it) }
         workspace.setOnItemCellDataChangedListener { viewModel.onItemCellDataChanged(it) }
         binding.hotSeat.root.setOnAllAppsButtonClickListener { selectWidget() }
 
@@ -107,24 +108,6 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         val shortcut = createShortcut(layout, item) ?: return
         if (layout.addViewToCell(shortcut, item)) viewModel.currentItems.add(item)
     }
-
-//    private fun addShortcut(packageName: String) {
-//        if (presenter.checkIsShortcutAlreadyAdded(packageName)) return
-//        val className = packageManager.getLaunchIntentForPackage(packageName)?.component?.className ?: return
-//        val itemCell = ItemCell(
-//            type = WorkspaceItemType.SHORTCUT,
-//            container = ContainerType.DESKTOP,
-//            packageName = packageName,
-//            className = className
-//        )
-//        addShortcut(ItemShortcut(itemCell))
-//        presenter.saveShortcutsFromTempList()
-//    }
-
-//    fun setWorkspaceInitProgressBarVisibility(visible: Boolean) {
-//        pbWorkspaceInit.visibility = if (visible) View.VISIBLE else View.GONE
-//        workspace.visibility = if (!visible) View.VISIBLE else View.GONE
-//    }
 
     private fun findAreaInCellLayout(item: ItemCell): Boolean {
         val position = mutableListOf(-1, -1)
@@ -178,13 +161,6 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         startActivity(intent)
     }
 
-//    private fun deleteShortcut(packageName: String) {
-//        val item = workspace.removeViewWithPackages(packageName) ?: return
-//        presenter.deleteItem(item)
-//    }
-
-    fun getDragLayer(): DragLayer = binding.dragLayer
-
     private fun snapToDesktop(desktopNumber: Int) {
         if (workspace.getCurrentPageNumber() != desktopNumber)
             workspace.snapToPage(desktopNumber)
@@ -196,21 +172,10 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         //isWorkspaceVisible = true
     }
 
-    override fun onResume() {
-        super.onResume()
-//        val filters = IntentFilter().apply {
-//            addAction(Intent.ACTION_PACKAGE_ADDED)
-//            addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED)
-//            addDataScheme("package")
-//        }
-//        registerReceiver(appsReceiver, filters)
-    }
-
     override fun onStop() {
         super.onStop()
         appWidgetHost.stopListening()
 //        isWorkspaceVisible = false
-//        unregisterReceiver(appsReceiver)
     }
 
 //    override fun onBackPressed() {
@@ -340,7 +305,7 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
     private fun deleteWidget(itemWidget: ItemWidget) {
         "WidgetDelete".easyLog(this)
         appWidgetHost.deleteAppWidgetId(itemWidget.appWidgetId)
-        //presenter.deleteItem(itemWidget)
+        viewModel.deleteItem(itemWidget)
     }
     /**-------Конец - Работа с виджетами-------*/
 }
