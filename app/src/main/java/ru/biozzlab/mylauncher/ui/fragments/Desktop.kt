@@ -1,6 +1,5 @@
 package ru.biozzlab.mylauncher.ui.fragments
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProviderInfo
 import android.content.ComponentName
@@ -24,6 +23,9 @@ import ru.biozzlab.mylauncher.domain.models.ItemWidget
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.domain.types.WorkspaceItemType
 import ru.biozzlab.mylauncher.easyLog
+import ru.biozzlab.mylauncher.ui.activity_contracts.AppWidgetBindContract
+import ru.biozzlab.mylauncher.ui.activity_contracts.AppWidgetCreateContract
+import ru.biozzlab.mylauncher.ui.activity_contracts.AppWidgetPickContract
 import ru.biozzlab.mylauncher.ui.layouts.CellLayout
 import ru.biozzlab.mylauncher.ui.layouts.Workspace
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
@@ -35,7 +37,6 @@ import ru.sir.presentation.extensions.launchWhenStarted
 import ru.sir.presentation.extensions.showToast
 
 class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopViewModel::class.java) {
-
     private lateinit var workspace: Workspace
 
     private lateinit var appWidgetHost: LauncherAppWidgetHost
@@ -181,10 +182,27 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
     }
 
     /**-------Работа с виджетами-------*/
-    companion object {
-        private const val REQUEST_CREATE_APPWIDGET = 2
-        private const val REQUEST_BIND_APPWIDGET = 3
-        private const val REQUEST_PICK_APPWIDGET = 4
+    private val requestAppWidgetBind = registerForActivityResult(AppWidgetBindContract()) { appWidgetId ->
+        appWidgetId ?: return@registerForActivityResult
+        if (appWidgetId < 0) return@registerForActivityResult
+
+        val widget = viewModel.queryToAddWidgets[appWidgetId] as? ItemWidget ?: return@registerForActivityResult
+        viewModel.queryToAddWidgets.remove(appWidgetId)
+        createWidget(appWidgetId, widget)
+    }
+
+    private val requestAppWidgetPick = registerForActivityResult(AppWidgetPickContract()) { appWidgetId ->
+        appWidgetId ?: return@registerForActivityResult
+        if (appWidgetId < 0) return@registerForActivityResult
+
+        configureWidget(appWidgetId)
+    }
+
+    private val requestAppWidgetCreate = registerForActivityResult(AppWidgetCreateContract()) { appWidgetId ->
+        appWidgetId ?: return@registerForActivityResult
+        if (appWidgetId < 0) return@registerForActivityResult
+
+        createWidget(appWidgetId)
     }
 
     private fun addWidget(widget: ItemWidget) {
@@ -202,13 +220,8 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         if (appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, widgetProvider)) {
             createWidget(appWidgetId, widget)
         } else {
-            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_BIND).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, widgetProvider)
-            }
-
             viewModel.queryToAddWidgets[appWidgetId] = widget
-            startActivityForResult(intent, REQUEST_BIND_APPWIDGET)
+            requestAppWidgetBind.launch(appWidgetId to widgetProvider)
         }
     }
 
@@ -262,31 +275,11 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
             viewModel.currentItems.add(widget)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == Activity.RESULT_OK) {
-            val appWidgetId = data?.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID) ?: return
-            when(requestCode) {
-                REQUEST_BIND_APPWIDGET -> {
-                    val widget = viewModel.queryToAddWidgets[appWidgetId] as? ItemWidget ?: return
-                    viewModel.queryToAddWidgets.remove(appWidgetId)
-                    createWidget(appWidgetId, widget)
-                }
-                REQUEST_PICK_APPWIDGET -> configureWidget(appWidgetId)
-                REQUEST_CREATE_APPWIDGET -> createWidget(appWidgetId)
-            }
-        }
-    }
-
     private fun configureWidget(appWidgetId: Int) {
         val appWidgetInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
 
         if (appWidgetInfo.configure != null) {
-            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE)
-            intent.component = appWidgetInfo.configure
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            startActivityForResult(intent, REQUEST_CREATE_APPWIDGET)
+            requestAppWidgetCreate.launch(appWidgetInfo.configure to appWidgetId)
         } else {
             createWidget(appWidgetId)
         }
@@ -294,10 +287,7 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
 
     private fun selectWidget() {
         val appWidgetId = appWidgetHost.allocateAppWidgetId()
-        val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK).apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-        }
-        startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET)
+        requestAppWidgetPick.launch(appWidgetId)
     }
 
     private fun deleteWidget(itemWidget: ItemWidget) {
