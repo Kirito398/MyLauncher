@@ -74,6 +74,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         this.dragView = view
 
         showDeleteRegion(true)
+        dragTargetLayout = getCurrentDragTargetLayout()
 
         beginDragShared(view)
     }
@@ -176,7 +177,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
     }
 
     override fun onDragOver(dragObject: DragObject) {
-        dragTargetLayout = getCurrentDragTargetLayout(dragObject)
+        dragTargetLayout = getCurrentDragTargetLayout(dragObject.x, dragObject.y)
 
         dragObject.dragView?.let {
             val isWidget = it.tag is ItemWidget
@@ -215,8 +216,11 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         layoutParams.showText = !dragTargetLayout.isHotSeat
 
         moveView(dragView)
-        updateView()
+        updateItem()
         dragView.requestLayout()
+
+        dropTargetCell[0] = -1
+        dropTargetCell[1] = -1
     }
 
     private fun checkInDeleteRegion(dragObject: DragObject): Boolean {
@@ -225,7 +229,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         return hitRect.contains(dragObject.x, dragObject.y)
     }
 
-    private fun updateView() {
+    private fun updateItem() {
         val item = dragView.tag as ItemCell
 
         item.cellX = dropTargetCell[0]
@@ -291,14 +295,14 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         return null
     }
 
-    private fun getCurrentDragTargetLayout(dragObject: DragObject): CellLayout {
+    private fun getCurrentDragTargetLayout(xPos: Int = -1, yPos: Int = -1): CellLayout {
         var layout = getChildAt(currentPage) as CellLayout
 
         hotSeat.let {
             val hitRect = Rect()
             it.getHitRect(hitRect)
 
-            if (hitRect.contains(dragObject.x, dragObject.y))
+            if (hitRect.contains(xPos, yPos))
                 layout = it.getCellLayout()
         }
 

@@ -92,7 +92,10 @@ class DragController {
                 motionDownY = position[1]
                 motionDownTime = System.currentTimeMillis()
             }
-            MotionEvent.ACTION_UP -> endDrag()
+            MotionEvent.ACTION_UP -> {
+                if (isDragging) drop(position[0], position[1])
+                endDrag()
+            }
         }
 
         return isDragging

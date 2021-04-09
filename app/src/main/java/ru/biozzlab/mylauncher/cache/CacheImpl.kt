@@ -28,7 +28,7 @@ class CacheImpl(private val roomManager: RoomManager, private val prefsManager: 
     }
 
     override fun updateCells(cells: List<ItemCell>): Either<None, List<ItemCell>> {
-        val item = roomManager.cellDao().updateList(convertModelToCellEntities(cells))
+        roomManager.cellDao().updateList(convertModelToCellEntities(cells))
         return Either.Right(cells)
     }
 
