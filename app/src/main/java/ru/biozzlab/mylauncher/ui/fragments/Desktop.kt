@@ -78,7 +78,7 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         }
 
         viewModel.removedItems.launchWhenStarted(lifecycleScope) {
-            it.forEach { item -> workspace.removeViewWithPackages(item.packageName) }
+            it.forEach { item -> if (item.type == WorkspaceItemType.SHORTCUT) workspace.removeViewWithPackages(item.packageName) }
         }
     }
 

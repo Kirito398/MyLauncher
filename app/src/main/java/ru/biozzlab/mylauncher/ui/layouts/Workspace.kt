@@ -264,6 +264,7 @@ class Workspace(context: Context, attributeSet: AttributeSet, defStyle: Int) : P
         var childNumber = -1
 
         for (i in 0 until childCount) {
+            if (i == defaultPage) continue
             val child: CellLayout = (getChildAt(i) as CellLayout)
             val areaPosition = child.findNearestArea(0, 0, spanX, spanY)
 

@@ -19,7 +19,7 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
         const val PAGE_SNAP_ANIMATION_DURATION = 550
     }
 
-    private val defaultPage: Int
+    protected val defaultPage: Int
     private val childOffset = mutableListOf<Int>()
     private val childRelativeOffset = mutableListOf<Int>()
     private val childOffsetWithLayoutScale = mutableListOf<Int>()
