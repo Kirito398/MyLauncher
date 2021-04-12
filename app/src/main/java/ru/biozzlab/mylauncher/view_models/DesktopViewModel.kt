@@ -29,6 +29,8 @@ class DesktopViewModel @Inject constructor(
     private val deleteCell: DeleteCell
 ) : BaseViewModel(application) {
 
+    private var isWorkspaceInit = false
+
     private val appsReceiver: PackageStatusChangeReceiver = PackageStatusChangeReceiver()
 
     private val _removedItems = MutableStateFlow(listOf<ItemCell>())
@@ -61,6 +63,7 @@ class DesktopViewModel @Inject constructor(
             addDataScheme("package")
         }
         context.registerReceiver(appsReceiver, filters)
+        if (isWorkspaceInit) updateDesktop()
     }
 
     override fun onStop() {
@@ -75,6 +78,7 @@ class DesktopViewModel @Inject constructor(
     fun updateDesktop() {
         updateItem()
         findNewItems()
+        isWorkspaceInit = true
     }
 
     fun saveItem(item: ItemCell) {
@@ -121,7 +125,9 @@ class DesktopViewModel @Inject constructor(
     }
 
     private fun checkIfItemRemoved(items: List<ItemCell>): List<ItemCell> {
-        _removedItems.value = removeDuplicateItems(currentItems, items)
+        val removed = removeDuplicateItems(currentItems, items)
+        currentItems.removeAll(removed)
+        _removedItems.value = removed
         return items
     }
 
