@@ -1,5 +1,6 @@
 package ru.biozzlab.mylauncher.di.modules
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.Module
@@ -11,6 +12,9 @@ import ru.biozzlab.mylauncher.data.Cache
 
 @Module
 class CacheModule(val context: Context) {
+
+    @Provides
+    fun provideApplication(): Application = context as Application
 
     @Provides
     fun provideCache(roomManager: RoomManager, prefsManager: SharedPrefsManager): Cache = CacheImpl(roomManager, prefsManager)

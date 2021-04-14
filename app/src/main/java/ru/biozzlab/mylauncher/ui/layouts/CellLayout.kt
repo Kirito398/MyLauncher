@@ -13,6 +13,7 @@ import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.R.styleable.CellLayout
 import ru.biozzlab.mylauncher.calculateDistance
 import ru.biozzlab.mylauncher.domain.models.ItemCell
+import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.layouts.params.CellLayoutParams
 import kotlin.math.max
 
@@ -85,7 +86,20 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
         container.removeView(view)
     }
 
-    fun addViewToCell(view: View, index: Int, id: Int, params: CellLayoutParams, markCells: Boolean): Boolean {
+    fun addViewToCell(view: View, item: ItemCell, index: Int = -1, markCells: Boolean = false): Boolean {
+        val params = view.layoutParams as CellLayoutParams
+
+        params.cellX = item.cellX
+        params.cellY = item.cellY
+        params.cellHSpan = item.cellHSpan
+        params.cellVSpan = item.cellVSpan
+
+        if (item.container == ContainerType.HOT_SEAT) params.showText = false
+
+        return addViewToCell(view, index, item.id.toInt(), params, markCells)
+    }
+
+    fun addViewToCell(view: View, index: Int, id: Int, params: CellLayoutParams, markCells: Boolean = false): Boolean {
         view.scaleX = 1.0F
         view.scaleY = 1.0F
 
@@ -102,6 +116,8 @@ class CellLayout(context: Context, attributeSet: AttributeSet, defStyle: Int)
 
             view.id = id
             container.addView(view, index, params)
+
+            removeCellsReserve(params.cellX, params.cellY, params.cellHSpan, params.cellVSpan)
 
             return true
         }

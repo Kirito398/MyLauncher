@@ -1,16 +1,25 @@
 package ru.biozzlab.mylauncher
 
-import android.app.Application
 import android.content.Context
 import ru.biozzlab.mylauncher.di.components.AppComponent
 import ru.biozzlab.mylauncher.di.components.DaggerAppComponent
 import ru.biozzlab.mylauncher.di.modules.CacheModule
+import ru.sir.presentation.base.BaseApplication
+import ru.sir.presentation.base.BaseDaggerComponent
+import java.lang.IllegalArgumentException
 
-class App : Application() {
+class App : BaseApplication() {
     companion object {
         var isScreenLarge: Boolean = false
         lateinit var appContext: Context
         lateinit var appComponent: AppComponent
+    }
+
+    override fun provideComponent(type: Class<out BaseDaggerComponent>): BaseDaggerComponent {
+        return when(type) {
+            AppComponent::class.java -> appComponent
+            else -> throw IllegalArgumentException("Dagger component not provided: $type")
+        }
     }
 
     override fun onCreate() {
