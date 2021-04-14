@@ -17,6 +17,8 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
     companion object {
         const val SIGNIFICANT_MOVE_THRESHOLD = 0.4F
         const val PAGE_SNAP_ANIMATION_DURATION = 550
+        private const val FLING_THRESHOLD_VELOCITY = 500
+        private const val MIN_LENGTH_FOR_FLING = 25
     }
 
     protected val defaultPage: Int
@@ -42,6 +44,9 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
     private var scrollIndicator: View? = null
     private var touchSlop: Int
 
+    private var velocityTracker: VelocityTracker? = null
+    private val flingThresholdVelocity: Int
+    private val maxVelocity: Int
 
     fun getNextPage() = if (nextPage != -1) nextPage else currentPage
 
@@ -56,6 +61,9 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
 
         val configuration = ViewConfiguration.get(context)
         touchSlop = configuration.scaledTouchSlop
+        maxVelocity = configuration.scaledMaximumFlingVelocity
+
+        flingThresholdVelocity = (FLING_THRESHOLD_VELOCITY * resources.displayMetrics.density).toInt()
 
         hierarchyChangeListener()
     }
@@ -93,13 +101,19 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
         if (childCount <= 0)
             return super.onInterceptTouchEvent(ev)
 
-        val action = ev?.action ?: return false
+        val event = ev ?: return false
+        initVelocityTracker(event)
+
+        val action = event.action
 
         if (action == MotionEvent.ACTION_MOVE && touchState == TouchStates.SCROLLING) return true
 
         when (action) {
-            MotionEvent.ACTION_DOWN -> initScrolling(ev)
-            MotionEvent.ACTION_MOVE -> scrollingStart(ev)
+            MotionEvent.ACTION_DOWN -> initScrolling(event)
+            MotionEvent.ACTION_MOVE -> scrollingStart(event)
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL,
+            MotionEvent.ACTION_POINTER_UP -> releaseVelocityTracker()
         }
 
         return touchState != TouchStates.REST
@@ -144,17 +158,25 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        val action = event?.action ?: return false
+    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+        if (childCount <= 0)
+            return super.onTouchEvent(ev)
 
-        return when (action) {
+        val event = ev ?: return false
+        initVelocityTracker(event)
+
+        return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 downMotionX = lastMotionX
                 if (touchState == TouchStates.SCROLLING) onScrollingStart()
-                return true
+                true
             }
             MotionEvent.ACTION_MOVE -> scrolling(event)
             MotionEvent.ACTION_UP -> snapToDestination(event)
+            MotionEvent.ACTION_CANCEL -> {
+                releaseVelocityTracker()
+                true
+            }
             else -> true
         }
     }
@@ -172,12 +194,16 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
 
                 totalMotionX += abs(lastMotionX - x)
 
+                val isFling = isFling()
+                val velocityX = velocityTracker?.getXVelocity(activePointerId)?.toInt() ?: 0
+
                 val isRtl = isLayoutRtl()
                 val isDeltaXLeft = if (isRtl) deltaX > 0 else deltaX < 0
+                val isVelocityXLeft = if (isRtl) velocityX > 0 else velocityX < 0
 
                 val finalPage = when {
-                    (isSignificantMove && !isDeltaXLeft && currentPage > 0) -> currentPage - 1
-                    (isSignificantMove && isDeltaXLeft && currentPage < childCount - 1) -> currentPage + 1
+                    isSnapToPrevPage(isSignificantMove, isDeltaXLeft, isVelocityXLeft, isFling) -> currentPage - 1
+                    isSnapToNextPage(isSignificantMove, isDeltaXLeft, isVelocityXLeft, isFling) -> currentPage + 1
                     else -> currentPage
                 }
 
@@ -187,7 +213,34 @@ abstract class PagedView(context: Context, attributeSet: AttributeSet, defStyle:
             TouchStates.NEXT_PAGE -> TODO()
         }
 
+        releaseVelocityTracker()
         return true
+    }
+
+    private fun isSnapToPrevPage(isSignificantMove: Boolean, isDeltaXLeft: Boolean, isVelocityXLeft: Boolean, isFling: Boolean) =
+        ((isSignificantMove && !isDeltaXLeft && !isFling) || (isFling && !isVelocityXLeft)) && currentPage > 0
+
+    private fun isSnapToNextPage(isSignificantMove: Boolean, isDeltaXLeft: Boolean, isVelocityXLeft: Boolean, isFling: Boolean) =
+        ((isSignificantMove && isDeltaXLeft && !isFling) || (isFling && isVelocityXLeft)) && currentPage < childCount - 1
+
+    private fun isFling(): Boolean {
+        var isFling = false
+        velocityTracker?.let {
+            it.computeCurrentVelocity(1000, maxVelocity.toFloat())
+            val velocityX = it.getXVelocity(activePointerId)
+            isFling = totalMotionX > MIN_LENGTH_FOR_FLING && abs(velocityX) > flingThresholdVelocity
+        }
+        return isFling
+    }
+
+    private fun initVelocityTracker(event: MotionEvent) {
+        if (velocityTracker == null) velocityTracker = VelocityTracker.obtain()
+        velocityTracker?.addMovement(event)
+    }
+
+    private fun releaseVelocityTracker() {
+        velocityTracker?.recycle()
+        velocityTracker = null
     }
 
     private fun snapToDestination(): Boolean {
