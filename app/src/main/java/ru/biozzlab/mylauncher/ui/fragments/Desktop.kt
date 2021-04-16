@@ -106,6 +106,11 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
             ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
         }
 
+        if (!viewModel.checkForLaunchIntent(item.packageName)) {
+            viewModel.deleteItem(item)
+            return
+        }
+
         val shortcut = createShortcut(layout, item) ?: return
         if (layout.addViewToCell(shortcut, item)) viewModel.currentItems.add(item)
     }
