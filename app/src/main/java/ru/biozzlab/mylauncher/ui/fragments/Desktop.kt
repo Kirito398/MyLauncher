@@ -106,6 +106,11 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
             ContainerType.DESKTOP -> workspace.getChildAt(item.desktopNumber) as CellLayout
         }
 
+        if (!viewModel.checkForLaunchIntent(item.packageName)) {
+            viewModel.deleteItem(item)
+            return
+        }
+
         val shortcut = createShortcut(layout, item) ?: return
         if (layout.addViewToCell(shortcut, item)) viewModel.currentItems.add(item)
     }
@@ -206,7 +211,7 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
     }
 
     private fun addWidget(widget: ItemWidget) {
-        val appWidgetId = appWidgetHost.allocateAppWidgetId()
+        val appWidgetId = appWidgetHost.allocateAppWidgetId() //TODO нельзя создавать новый, нужно брать из БД
 
         var widgetInfo: AppWidgetProviderInfo? = null
         for (widgetProvider in appWidgetManager.installedProviders) {

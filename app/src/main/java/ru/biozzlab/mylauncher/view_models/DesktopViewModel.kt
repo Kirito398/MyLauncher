@@ -63,7 +63,7 @@ class DesktopViewModel @Inject constructor(
             addDataScheme("package")
         }
         context.registerReceiver(appsReceiver, filters)
-        if (isWorkspaceInit) updateDesktop()
+        //if (isWorkspaceInit) updateDesktop()
     }
 
     override fun onStop() {
@@ -155,17 +155,20 @@ class DesktopViewModel @Inject constructor(
 
     private fun checkForLaunchIntent(appList: List<ApplicationInfo>): MutableList<ApplicationInfo> {
         val launchApps = mutableListOf<ApplicationInfo>()
-        val packageManager = context.packageManager
 
-        for (info in appList) {
-            try {
-                if (packageManager.getLaunchIntentForPackage(info.packageName) != null)
-                    launchApps.add(info)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        for (info in appList)
+            if (checkForLaunchIntent(info.packageName)) launchApps.add(info)
 
         return launchApps
+    }
+
+    fun checkForLaunchIntent(packageName: String): Boolean {
+        val packageManager = context.packageManager
+        return try {
+            packageManager.getLaunchIntentForPackage(packageName) != null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 }
