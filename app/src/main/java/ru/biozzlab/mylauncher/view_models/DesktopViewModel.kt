@@ -63,7 +63,7 @@ class DesktopViewModel @Inject constructor(
             addDataScheme("package")
         }
         context.registerReceiver(appsReceiver, filters)
-        if (isWorkspaceInit) updateDesktop()
+        //if (isWorkspaceInit) updateDesktop()
     }
 
     override fun onStop() {

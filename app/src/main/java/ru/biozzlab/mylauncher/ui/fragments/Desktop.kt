@@ -211,7 +211,7 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
     }
 
     private fun addWidget(widget: ItemWidget) {
-        val appWidgetId = appWidgetHost.allocateAppWidgetId()
+        val appWidgetId = appWidgetHost.allocateAppWidgetId() //TODO нельзя создавать новый, нужно брать из БД
 
         var widgetInfo: AppWidgetProviderInfo? = null
         for (widgetProvider in appWidgetManager.installedProviders) {
