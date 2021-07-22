@@ -177,8 +177,8 @@ class Desktop : BaseFragment<DesktopViewModel, FragmentDesktopBinding>(DesktopVi
         appWidgetHost.startListening()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         appWidgetHost.stopListening()
     }
 
