@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="app_icon_size">90dp</dimen>
+    <dimen name="app_icon_size">120dp</dimen>
+    <dimen name="app_icon_padding">50dp</dimen>
 
     <dimen name="hot_seat_cell_width">135dp</dimen>
     <dimen name="hot_seat_cell_height">135dp</dimen>
     <dimen name="hot_seat_padding_start">10dp</dimen>
     <dimen name="hot_seat_height_gap">15dp</dimen>
 
-    <dimen name="cell_layout_padding_top">60dp</dimen>
+    <dimen name="cell_layout_padding_top">30dp</dimen>
     <dimen name="cell_layout_padding_start">50dp</dimen>
     <dimen name="cell_layout_padding_end">50dp</dimen>
-    <dimen name="cell_layout_cell_width">160dp</dimen>
-    <dimen name="cell_layout_cell_height">140dp</dimen>
-    <dimen name="cell_layout_width_gap">50dp</dimen>
-    <dimen name="cell_layout_height_gap">55dp</dimen>
-    <dimen name="cell_layout_max_gap">16dp</dimen>
+    <dimen name="cell_layout_cell_width">200dp</dimen>
+    <dimen name="cell_layout_cell_height">200dp</dimen>
+    <dimen name="cell_layout_width_gap">0dp</dimen>
+    <dimen name="cell_layout_height_gap">0dp</dimen>
+    <dimen name="cell_layout_max_gap">0dp</dimen>
 </resources>
