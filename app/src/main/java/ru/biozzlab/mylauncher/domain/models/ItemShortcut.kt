@@ -68,10 +68,12 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
     private fun createIconBitmap(icon: Drawable): Bitmap {
         val resources = App.appContext.resources
 
-        val iconBorderRadius = resources.getDimension(R.dimen.app_icon_border_radius)
-        val iconPadding = resources.getDimension(R.dimen.app_icon_padding).toInt()
-        val iconStroke = resources.getDimension(R.dimen.app_icon_border_stroke)
-        var width: Int = resources.getDimension(R.dimen.app_icon_size).toInt()
+        val isHotSeat = container == ContainerType.HOT_SEAT
+
+        val iconBorderRadius = resources.getDimension(if (isHotSeat) R.dimen.hot_seat_app_icon_border_radius else R.dimen.app_icon_border_radius)
+        val iconPadding = resources.getDimension(if (isHotSeat) R.dimen.hot_seat_app_icon_padding else R.dimen.app_icon_padding).toInt()
+        val iconStroke = resources.getDimension(if (isHotSeat) R.dimen.hot_seat_app_icon_border_stroke else R.dimen.app_icon_border_stroke)
+        var width: Int = resources.getDimension(if (isHotSeat) R.dimen.hot_seat_app_icon_size else R.dimen.app_icon_size).toInt()
         var height: Int = width
         val textureWidth = width + iconPadding
         val textureHeight = width + iconPadding
@@ -122,7 +124,7 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         paint.strokeWidth = iconStroke
         canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
 
-        if (container == ContainerType.HOT_SEAT) {
+        if (isHotSeat) {
             val matrix = ColorMatrix()
             matrix.setSaturation(0F)
 

@@ -3,6 +3,11 @@
     <dimen name="app_icon_size">120dp</dimen>
     <dimen name="app_icon_padding">50dp</dimen>
 
+    <dimen name="hot_seat_app_icon_size">90dp</dimen>
+    <dimen name="hot_seat_app_icon_padding">20dp</dimen>
+    <dimen name="hot_seat_app_icon_border_radius">5dp</dimen>
+    <dimen name="hot_seat_app_icon_border_stroke">2dp</dimen>
+
     <dimen name="hot_seat_cell_width">135dp</dimen>
     <dimen name="hot_seat_cell_height">135dp</dimen>
     <dimen name="hot_seat_padding_start">10dp</dimen>
