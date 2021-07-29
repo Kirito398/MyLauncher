@@ -17,6 +17,7 @@ import ru.biozzlab.mylauncher.R
 import ru.biozzlab.mylauncher.domain.types.ContainerType
 import ru.biozzlab.mylauncher.ui.views.IconDrawable
 
+
 class ItemShortcut(cell: ItemCell) : ItemCell(
     cell.id,
     cell.type,
@@ -115,14 +116,16 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
 
         val paint = Paint()
         paint.isAntiAlias = true
-
-        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_color)
-        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
-
+        paint.isDither = true
+        paint.shader = getGradient(isHotSeat, bitmap.width.toFloat(), bitmap.height.toFloat())
         paint.style = Paint.Style.STROKE
-        paint.color = ContextCompat.getColor(App.appContext, R.color.app_icon_background_stroke_color)
         paint.strokeWidth = iconStroke
-        canvas.drawRoundRect(RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()), iconBorderRadius, iconBorderRadius, paint)
+        canvas.drawRoundRect(
+            RectF(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat()),
+            iconBorderRadius,
+            iconBorderRadius,
+            paint
+        )
 
         if (isHotSeat) {
             val matrix = ColorMatrix()
@@ -145,5 +148,16 @@ class ItemShortcut(cell: ItemCell) : ItemCell(
         iconBitmap = bitmap
 
         return bitmap
+    }
+
+    private fun getGradient(isHotSeat: Boolean, width: Float, height: Float): LinearGradient {
+        val strokeColorStart = ContextCompat.getColor(
+            App.appContext,
+            R.color.app_icon_border_color_start
+        )
+        val strokeColorEnd =
+            if (isHotSeat) ContextCompat.getColor(App.appContext, R.color.app_icon_border_color_end_hot_seat)
+            else ContextCompat.getColor(App.appContext, R.color.app_icon_border_color_end_workspace)
+        return LinearGradient(0F, 0F, width, height, intArrayOf(strokeColorStart, strokeColorEnd), floatArrayOf(0F, 0.7F), Shader.TileMode.CLAMP)
     }
 }

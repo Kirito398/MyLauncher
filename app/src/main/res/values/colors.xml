@@ -10,4 +10,7 @@
     <color name="hot_seat_text_color">#00FFFFFF</color>
     <color name="app_icon_background_color">#400085FF</color>
     <color name="app_icon_background_stroke_color">#400085FF</color>
+    <color name="app_icon_border_color_start">#50596F</color>
+    <color name="app_icon_border_color_end_workspace">#1D202A</color>
+    <color name="app_icon_border_color_end_hot_seat">#0E1015</color>
 </resources>
