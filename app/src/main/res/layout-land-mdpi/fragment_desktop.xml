@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.Launcher"
     android:id="@+id/clLayout"
-    android:background="@drawable/main_background">
+    android:background="@color/black">
 
     <ru.biozzlab.mylauncher.ui.layouts.DragLayer
         android:id="@+id/dragLayer"
@@ -29,7 +29,8 @@
             app:layout_constraintStart_toEndOf="@id/hotSeat"
             app:layout_constraintBottom_toTopOf="@id/ivPageIndicator"
             app:layout_constraintHorizontal_weight="7"
-            app:defaultPage="@integer/workspace_default_page">
+            app:defaultPage="@integer/workspace_default_page"
+            android:background="@drawable/background_workspace">
 
             <include
                 android:id="@+id/cell1"
