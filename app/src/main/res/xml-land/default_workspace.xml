@@ -1,24 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <favorites xmlns:launcher="http://schemas.android.com/apk/res-auto">
-<!--    <appwidget-->
-<!--        launcher:id="1"-->
-<!--        launcher:packageName="ru.biozzlab.clocktestwidget"-->
-<!--        launcher:className="ru.biozzlab.clocktestwidget.ClockWidget"-->
-<!--        launcher:container="1"-->
-<!--        launcher:desktopNumber="0"-->
-<!--        launcher:x="3"-->
-<!--        launcher:y="0"-->
-<!--        launcher:spanX="2"-->
-<!--        launcher:spanY="1" />-->
 
-<!--    <appwidget-->
-<!--        launcher:id="2"-->
-<!--        launcher:packageName="ru.biozzlab.playertestwidget"-->
-<!--        launcher:className="ru.biozzlab.playertestwidget.NewAppWidget"-->
-<!--        launcher:container="1"-->
-<!--        launcher:desktopNumber="0"-->
-<!--        launcher:x="3"-->
-<!--        launcher:y="1"-->
-<!--        launcher:spanX="2"-->
-<!--        launcher:spanY="2" />-->
+    <favorite
+        launcher:id="1"
+        launcher:packageName="ru.kamaz.radio"
+        launcher:className="ru.kamaz.radio.ui.MainActivity"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="2"
+        launcher:packageName="ru.bis.phone"
+        launcher:className="ru.bis.phone.presentation.main.MainActivity"
+        launcher:container="1"
+        launcher:x="1"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="3"
+        launcher:packageName="ru.kamaz.musickamaz"
+        launcher:className="ru.kamaz.musickamaz.ui.MainActivity"
+        launcher:container="1"
+        launcher:x="2"
+        launcher:y="0" />
+
+    <favorite
+        launcher:id="4"
+        launcher:packageName="com.tw.twfileexplore"
+        launcher:className="com.tw.twfileexplore.ui.view.activity.ExploreActivity"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="1" />
+
+    <favorite
+        launcher:id="5"
+        launcher:packageName="com.android.chrome"
+        launcher:className="com.google.android.apps.chrome.Main"
+        launcher:container="1"
+        launcher:x="1"
+        launcher:y="1" />
+
+    <favorite
+        launcher:id="6"
+        launcher:packageName="com.tw.video"
+        launcher:className="com.tw.video.VideoActivity"
+        launcher:container="1"
+        launcher:x="2"
+        launcher:y="1" />
+
+    <favorite
+        launcher:id="7"
+        launcher:packageName="ru.bis.kamazstore"
+        launcher:className="ru.bis.kamazstore.ui.MainActivity"
+        launcher:container="1"
+        launcher:x="0"
+        launcher:y="2" />
+
+    <favorite
+        launcher:id="8"
+        launcher:packageName="ru.sir.settings"
+        launcher:className="ru.sir.settings.ui.MainActivity"
+        launcher:container="1"
+        launcher:x="1"
+        launcher:y="2" />
+
+    <appwidget
+        launcher:id="9"
+        launcher:packageName="ru.kamaz.musickamaz"
+        launcher:className="ru.kamaz.music.ui.TestWidget"
+        launcher:container="1"
+        launcher:desktopNumber="0"
+        launcher:x="3"
+        launcher:y="1"
+        launcher:spanX="2"
+        launcher:spanY="2" />
+
+    <favorite
+        launcher:id="10"
+        launcher:packageName="ru.biozzlab.mylauncher"
+        launcher:className="ru.biozzlab.mylauncher.ui.Launcher"
+        launcher:container="0"
+        launcher:x="0"
+        launcher:y="1" />
+
 </favorites>

@@ -5,7 +5,7 @@
     <dimen name="app_icon_border_radius">5dp</dimen>
     <dimen name="app_icon_border_stroke">5dp</dimen>
     <dimen name="app_icon_text_padding">1dp</dimen>
-    <dimen name="app_icon_text_size">16sp</dimen>
+    <dimen name="app_icon_text_size">18sp</dimen>
 
     <dimen name="workspace_cell_width_land">106dp</dimen>
     <integer name="workspace_default_page">0</integer>
