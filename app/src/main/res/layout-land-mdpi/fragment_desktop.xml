@@ -62,6 +62,8 @@
             app:layout_constraintStart_toEndOf="@id/hotSeat"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
             android:src="@drawable/scroll_indicator"
             android:scaleType="fitXY"/>
 
