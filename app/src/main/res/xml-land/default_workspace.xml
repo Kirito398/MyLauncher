@@ -11,16 +11,16 @@
 
     <favorite
         launcher:id="2"
-        launcher:packageName="ru.bis.phone"
-        launcher:className="ru.bis.phone.presentation.main.MainActivity"
+        launcher:packageName="com.simplemobiletools.gallery.pro"
+        launcher:className="com.simplemobiletools.gallery.pro.activities.MainActivity"
         launcher:container="1"
         launcher:x="1"
         launcher:y="0" />
 
     <favorite
         launcher:id="3"
-        launcher:packageName="ru.kamaz.musickamaz"
-        launcher:className="ru.kamaz.musickamaz.ui.MainActivity"
+        launcher:packageName="com.tw.video"
+        launcher:className="com.tw.video.VideoActivity"
         launcher:container="1"
         launcher:x="2"
         launcher:y="0" />
@@ -43,26 +43,18 @@
 
     <favorite
         launcher:id="6"
-        launcher:packageName="com.tw.video"
-        launcher:className="com.tw.video.VideoActivity"
+        launcher:packageName="ru.bis.kamazstore"
+        launcher:className="ru.bis.kamazstore.ui.MainActivity"
         launcher:container="1"
         launcher:x="2"
         launcher:y="1" />
 
     <favorite
         launcher:id="7"
-        launcher:packageName="ru.bis.kamazstore"
-        launcher:className="ru.bis.kamazstore.ui.MainActivity"
-        launcher:container="1"
-        launcher:x="0"
-        launcher:y="2" />
-
-    <favorite
-        launcher:id="8"
         launcher:packageName="ru.sir.settings"
         launcher:className="ru.sir.settings.ui.MainActivity"
         launcher:container="1"
-        launcher:x="1"
+        launcher:x="0"
         launcher:y="2" />
 
     <appwidget
@@ -78,10 +70,26 @@
 
     <favorite
         launcher:id="10"
-        launcher:packageName="ru.biozzlab.mylauncher"
-        launcher:className="ru.biozzlab.mylauncher.ui.Launcher"
+        launcher:packageName="ru.kamaz.musickamaz"
+        launcher:className="ru.kamaz.musickamaz.ui.MainActivity"
         launcher:container="0"
         launcher:x="0"
         launcher:y="1" />
+
+    <favorite
+        launcher:id="11"
+        launcher:packageName="ru.bis.phone"
+        launcher:className="ru.bis.phone.presentation.main.MainActivity"
+        launcher:container="0"
+        launcher:x="0"
+        launcher:y="2" />
+
+    <favorite
+        launcher:id="12"
+        launcher:packageName="com.navitel"
+        launcher:className="com.navitel.Navitel"
+        launcher:container="0"
+        launcher:x="0"
+        launcher:y="0" />
 
 </favorites>
