@@ -4,9 +4,13 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
 
-    <color name="main_background_color">#71A8E0</color>
+    <color name="black">#000000</color>
+    <color name="main_background_color">#1D202A</color>
     <color name="workspace_icon_text_color">#FFFFFF</color>
     <color name="hot_seat_text_color">#00FFFFFF</color>
     <color name="app_icon_background_color">#400085FF</color>
     <color name="app_icon_background_stroke_color">#400085FF</color>
+    <color name="app_icon_border_color_start">#50596F</color>
+    <color name="app_icon_border_color_end_workspace">#1D202A</color>
+    <color name="app_icon_border_color_end_hot_seat">#0E1015</color>
 </resources>

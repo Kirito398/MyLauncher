@@ -7,8 +7,7 @@
     app:cellCountX="@integer/hot_seat_column_count"
     app:cellCountY="@integer/hot_seat_row_count"
     app:showMenuButton="@bool/hot_seat_menu_button_visible"
-    app:menuButtonPosition="@integer/hot_seat_menu_button_position"
-    android:background="@drawable/ic_hotseat_background">
+    app:menuButtonPosition="@integer/hot_seat_menu_button_position">
 
     <ru.biozzlab.mylauncher.ui.layouts.CellLayout
         android:id="@+id/hotSeatContent"

@@ -79,6 +79,9 @@ abstract class RoomManager : RoomDatabase() {
 
                                 if (id == -1 || cellX == -1 || cellY == -1) continue
 
+                                val spanX = attrs.getInt(R.styleable.Favorite_spanX, 1)
+                                val spanY = attrs.getInt(R.styleable.Favorite_spanY, 1)
+
                                 val values = ContentValues()
                                 values.put(TAG_ID, id)
                                 values.put(TAG_PACKAGE_NAME, packageName)
@@ -87,6 +90,8 @@ abstract class RoomManager : RoomDatabase() {
                                 values.put(TAG_CELL_X, cellX)
                                 values.put(TAG_CELL_Y, cellY)
                                 values.put(TAG_DESKTOP_NUMBER, desktopNumber)
+                                values.put(TAG_SPAN_X, spanX)
+                                values.put(TAG_SPAN_Y, spanY)
 
                                 addInDb(name, values, db, context, attrs)
                             }
@@ -110,13 +115,7 @@ abstract class RoomManager : RoomDatabase() {
         }
 
         private fun addAppWidget(context: Context, db: SupportSQLiteDatabase, values: ContentValues, attrs: TypedArray) {
-            val spanX = attrs.getInt(R.styleable.Favorite_spanX, 1)
-            val spanY = attrs.getInt(R.styleable.Favorite_spanY, 1)
-
             values.put(TAG_ITEM_TYPE, WorkspaceItemType.WIDGET.type)
-            values.put(TAG_SPAN_X, spanX)
-            values.put(TAG_SPAN_Y, spanY)
-
             db.insert(TABLE_CELLS, SQLiteDatabase.CONFLICT_REPLACE, values)
         }
     }
